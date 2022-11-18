@@ -22,5 +22,7 @@ class CommentController extends Controller
         ]);
 
         return new CommentResource($post->comments);
+
+        dd("lol");
     }
 }
