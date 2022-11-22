@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Comment extends Model
+class Tag extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["user_id", "post_id", "body"];
+    protected $fillable = ["name"];
 
-    public function post()
+    public function posts()
     {
-        return $this->belongsTo(Post::class);
+        return $this->morphedByMany(Post::class, "taggable");
     }
 }

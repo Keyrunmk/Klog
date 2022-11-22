@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
-use GuzzleHttp\Psr7\Response;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image;
 
 class ProfileController extends Controller
 {
@@ -20,12 +18,26 @@ class ProfileController extends Controller
         $attributes = request()->validate([
             "title" => ["nullable", "string"],
             "description" => ["nullable", "string"],
-            "url" => ["nullable", "url"]
+            "url" => ["nullable", "url"],
+            "image" => ["nullable", "image"],
         ]);
 
-        $profile = Auth::user()->profile;
+        $user = auth()->user();
+        $profile = $user->profile;
 
-        $profile->update($attributes);
+        $profile->update([
+            "title" => $attributes["title"],
+            "description" => $attributes["description"],
+            "url" => $attributes["url"]
+        ]);
+
+        $imagePath = request("image")->store("uploads", "public");
+        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
+        $image->save();
+
+        if (!$user->image()->update(["path" => $imagePath])){
+            $user->image()->create(["path" => $imagePath]);
+        }
 
         return new ProfileResource($profile);
     }
