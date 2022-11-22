@@ -22,7 +22,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      */
     public function register()
     {
-        //
+        dd("changes");
     }
 
     /**
