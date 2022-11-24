@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Contracts\CategoryContract;
 use App\Contracts\PostContract;
+use App\Contracts\UserContract;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,6 +16,7 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
     public $bindings = [
         PostContract::class => PostRepository::class,
         CategoryContract::class => CategoryRepository::class,
+        UserContract::class => UserRepository::class,
     ];
     /**
      * Register services.

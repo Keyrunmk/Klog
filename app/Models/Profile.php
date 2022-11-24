@@ -9,7 +9,12 @@ class Profile extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["title", "description", "url", "user_id", "category_id"];
+    protected $fillable = [
+        "title",
+        "description",
+        "url",
+        "user_id",
+    ];
 
     public function user()
     {

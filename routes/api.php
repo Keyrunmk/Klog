@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,10 +29,10 @@ Route::middleware("auth:sanctum")->get("/user", function (Request $request) {
 Route::get("/", [HomeController::class, "index"]);
 
 //login and registration
-Route::post("login", [AuthController::class, "login"])->middleware("guest");
-Route::post("register", [AuthController::class, "register"])->middleware("guest");
-Route::post("logout", [AuthController::class, "logout"])->middleware("auth:api");
-Route::post("refresh", [AuthController::class, "refresh"])->middleware("auth:api");
+Route::post("login", [LoginController::class, "login"])->middleware("guest");
+Route::post("register", [RegisterController::class, "register"])->middleware("guest");
+Route::post("logout", [LoginController::class, "logout"])->middleware("auth:api");
+Route::post("refresh", [LoginController::class, "refresh"])->middleware("auth:api");
 
 //profile
 Route::prefix("profile")->middleware("auth:api")->group(function () {
@@ -58,5 +59,8 @@ Route::prefix("category")->middleware("auth:api")->group(function () {
     Route::delete("{category:slug}", [CategoryController::class, "destroy"]);
 });
 
-//create tags
-Route::post("post/{post}/tag", [TagController::class, "store"])->middleware("auth:api");
+//tags
+Route::prefix("tag")->middleware("auth:api")->group(function () {
+    Route::post("post/{post}", [TagController::class, "store"]);
+    Route::post("user/{user}", [HomeController::class, "store"]);
+});

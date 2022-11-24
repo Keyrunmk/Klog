@@ -23,6 +23,7 @@ class User extends Authenticatable implements JWTSubject
         "username",
         "email",
         "password",
+        "status"
     ];
 
     /**
@@ -78,5 +79,15 @@ class User extends Authenticatable implements JWTSubject
     public function image()
     {
         return $this->morphOne(Image::class, "imageable");
+    }
+
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, "taggable");
+    }
+
+    public function location()
+    {
+        return $this->morphMany(Location::class, "locationable");
     }
 }
