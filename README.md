@@ -32,6 +32,7 @@ WEB
 -> After user registration completion, user can choose tags of stuffs that user likes
 -> After user registration, send email (Events and listeners)
 -> Cache, Jobs and queues
+-> Gates and Policies
 -> Repositories and design patterns (SOLID)
 -> Search
 
@@ -42,6 +43,8 @@ ADMIN
 -> Admin login
 -> Admin can create managers and editors
 -> Admin can change blog settings
+-> Roles and Permissions
+-> Gates and Policies
 
 Managers
 -> Managers can create editors and assign tasks (cannot manage posts)

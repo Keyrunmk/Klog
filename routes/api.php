@@ -42,7 +42,7 @@ Route::prefix("profile")->middleware("auth:api")->group(function () {
 //posts
 Route::prefix("post")->middleware("auth:api")->group(function () {
     Route::post("", [PostController::class, "store"]);
-    Route::patch("{post}", [PostController::class, "update"]);
+    Route::patch("{post}", [PostController::class, "update"])->middleware("can:update,post");
     Route::get("{post:slug}", [PostController::class, "show"]);
     Route::delete("{post:slug}", [PostController::class, "destroy"]);
 
