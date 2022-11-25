@@ -10,7 +10,7 @@ Users
 -> A user can post comments
 -> A user can hit (like) posts
 
-Profil
+Profile
 -> A profile can have an image, title, description and url
 
 Posts
@@ -47,6 +47,8 @@ ADMIN
 -> Admin login
 -> Admin can create managers and editors
 -> Admin can change blog settings
+-> Roles and Permissions
+-> Gates and Policies
 
 Managers
 -> Managers can create editors and assign tasks (cannot manage posts)

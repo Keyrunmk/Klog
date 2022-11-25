@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 class RepositoryServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     public $bindings = [
+        ProfileContract::class => ProfileRepository::class,
         PostContract::class => PostRepository::class,
         CategoryContract::class => CategoryRepository::class,
         UserContract::class => UserRepository::class,

@@ -36,15 +36,15 @@ Route::post("refresh", [LoginController::class, "refresh"])->middleware("auth:ap
 
 //profile
 Route::prefix("profile")->middleware("auth:api")->group(function () {
-    Route::get("{profile}", [ProfileController::class, "show"]);
-    Route::patch("{profile}", [ProfileController::class, "update"]);
+    Route::get("{profile}", [ProfileController::class, "show"])->middleware("can:view,profile");
+    Route::patch("{profile}", [ProfileController::class, "update"])->middleware("can:update,profile");
 });
 
 //posts
 Route::prefix("post")->middleware("auth:api")->group(function () {
     Route::post("", [PostController::class, "store"]);
-    Route::patch("{post}", [PostController::class, "update"]);
-    Route::get("{post:slug}", [PostController::class, "show"]);
+    Route::patch("{post}", [PostController::class, "update"])->middleware("can:update,post");
+    Route::get("{post:slug}", [PostController::class, "show"])->middleware("can:show,post");
     Route::delete("{post:slug}", [PostController::class, "destroy"]);
 
     //comments
