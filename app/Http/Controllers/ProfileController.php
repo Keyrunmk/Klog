@@ -8,12 +8,14 @@ use Intervention\Image\Facades\Image;
 
 class ProfileController extends Controller
 {
+    protected $profileRepository;
+
     public function show(Profile $profile)
     {
         return new ProfileResource($profile);
     }
 
-    public function update()
+    public function update(Profile $profile)
     {
         $attributes = request()->validate([
             "title" => ["nullable", "string"],
