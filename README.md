@@ -8,7 +8,7 @@ Users
 -> A user can have many posts
 -> A user can post comments
 
-Profil
+Profile
 -> A profile can have an image
 
 Posts
