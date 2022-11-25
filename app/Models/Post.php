@@ -9,7 +9,14 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["slug", "title", "body", "user_id", "category_id", "location_id"];
+    protected $fillable = [
+        "slug",
+        "title",
+        "body",
+        "user_id",
+        "category_id",
+        "location_id",
+    ];
 
     public function category()
     {
@@ -36,8 +43,13 @@ class Post extends Model
         return $this->morphToMany(Tag::class, "taggable");
     }
 
-    public function location()
+    public function postLocation()
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function location()
+    {
+        return $this->morphMany(Location::class, "locationable");
     }
 }

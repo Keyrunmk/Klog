@@ -9,10 +9,15 @@ class Location extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["location"];
+    protected $fillable = ["country_name"];
 
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function locationable()
+    {
+        return $this->morphTo();
     }
 }

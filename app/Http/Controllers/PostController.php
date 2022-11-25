@@ -27,14 +27,12 @@ class PostController extends Controller
 
     public function store()
     {
-        $location = Location::where("location", UserLocation::getCountryName())->first();
-        if (! $location) {
-            $location = Location::create(["location" => UserLocation::getCountryName()]);
-        }
+        $location = UserLocation::getCountryName();
+        $location_id = Location::where("country_name",$location)->value("id");
 
         $attributes = array_merge($this->validatePost(), [
             "user_id" => Auth::user()->id,
-            "location_id" => $location->id,
+            "location_id" => $location_id,
         ]);
 
         $imagePath = request("image")->store("uploads", "public");
@@ -44,6 +42,8 @@ class PostController extends Controller
         $post = $this->postRepository->createPost($attributes);
 
         $post->image()->create(["path" => $imagePath]);
+
+        $post->location()->create(["country_name" => $location]);
 
         return new PostResource($post);
     }

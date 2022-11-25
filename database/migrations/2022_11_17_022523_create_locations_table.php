@@ -15,7 +15,9 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string("location")->default("world")->unique();
+            $table->string("country_name")->default("world");
+            $table->integer("locationable_id");
+            $table->string("locationable_type");
             $table->timestamps();
         });
     }
