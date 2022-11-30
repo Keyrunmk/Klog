@@ -2,44 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
-use Intervention\Image\Facades\Image;
+use App\Services\ProfileUpdate;
 
 class ProfileController extends Controller
 {
     protected $profileRepository;
+    protected ProfileUpdate $profileUpdate;
 
-    public function show(Profile $profile)
+    public function __construct(ProfileUpdate $profileUpdate)
+    {
+        $this->profileUpdate = $profileUpdate;
+    }
+
+    public function show(Profile $profile): ProfileResource
     {
         return new ProfileResource($profile);
     }
 
-    public function update(Profile $profile)
+    public function update(Profile $profile, ProfileRequest $request): mixed
     {
-        $attributes = request()->validate([
-            "title" => ["nullable", "string"],
-            "description" => ["nullable", "string"],
-            "url" => ["nullable", "url"],
-            "image" => ["nullable", "image"],
-        ]);
+        $attributes = $request->validated();
 
-        $user = auth()->user();
-        $profile = $user->profile;
-
-        $profile->update([
-            "title" => $attributes["title"],
-            "description" => $attributes["description"],
-            "url" => $attributes["url"]
-        ]);
-
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
-
-        if (!$user->image()->update(["path" => $imagePath])){
-            $user->image()->create(["path" => $imagePath]);
-        }
+        $profile = $this->profileUpdate->__invoke($profile, $attributes);
 
         return new ProfileResource($profile);
     }

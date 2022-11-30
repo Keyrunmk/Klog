@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Http\Resources\BaseResource;
 use App\Mail\WelcomeNewUserMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -28,7 +29,7 @@ class SendWelcomeEmail
     public function handle($event)
     {
         Mail::to($event->user->email)->send(new WelcomeNewUserMail());
-        return response()->json([
+        return new BaseResource([
             "mail_status" => "sent",
         ]);
     }

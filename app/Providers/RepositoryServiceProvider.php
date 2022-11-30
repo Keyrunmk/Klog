@@ -2,23 +2,29 @@
 
 namespace App\Providers;
 
+use App\Contracts\AdminContract;
 use App\Contracts\CategoryContract;
 use App\Contracts\PostContract;
+use App\Contracts\TagContract;
 use App\Contracts\UserContract;
+use App\Repositories\AdminRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\TagRepository;
 use App\Repositories\UserRepository;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class RepositoryServiceProvider extends ServiceProvider implements DeferrableProvider
+class RepositoryServiceProvider extends ServiceProvider
 {
-    public $bindings = [
+    public $repositories = [
+        AdminContract::class => AdminRepository::class,
+        UserContract::class => UserRepository::class,
         ProfileContract::class => ProfileRepository::class,
         PostContract::class => PostRepository::class,
+        TagContract::class => TagRepository::class,
         CategoryContract::class => CategoryRepository::class,
-        UserContract::class => UserRepository::class,
     ];
+
     /**
      * Register services.
      *
@@ -36,13 +42,8 @@ class RepositoryServiceProvider extends ServiceProvider implements DeferrablePro
      */
     public function boot()
     {
-        // foreach ($this->repositories as $interface => $repository) {
-        //     $this->app->bind($interface, $repository);
-        // }
-    }
-
-    public function provides()
-    {
-        return array_keys($this->bindings);
+        foreach ($this->repositories as $interface => $repository) {
+            $this->app->bind($interface, $repository);
+        }
     }
 }

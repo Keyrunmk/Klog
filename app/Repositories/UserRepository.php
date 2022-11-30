@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\UserContract;
 use App\Models\User;
+use Exception;
 
 class UserRepository extends BaseRepository implements UserContract
 {
@@ -14,6 +15,10 @@ class UserRepository extends BaseRepository implements UserContract
 
     public function createUser(array $attibutes): mixed
     {
-        return $this->create($attibutes);
+        try {
+            return $this->create($attibutes);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

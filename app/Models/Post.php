@@ -52,4 +52,9 @@ class Post extends Model
     {
         return $this->morphMany(Location::class, "locationable");
     }
+
+    public function postReports()
+    {
+        return $this->hasMany(PostReport::class);
+    }
 }

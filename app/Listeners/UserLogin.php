@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\UserRegisteredEvent;
+use App\Http\Resources\BaseResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -32,7 +33,7 @@ class UserLogin
         try {
             $token = Auth::login($event->user);
         } catch (JWTException $e) {
-            return response()->json(["message" => $e->getMessage()]);
+            return new BaseResource(["message" => $e->getMessage()]);
         }
 
         return new UserResource($event->user, $token);

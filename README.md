@@ -3,6 +3,7 @@ Klog - A simple blog
 Features:
 Users
 -> A user can be registered
+-> Only registered when user is verified
 -> Registration using jwt
 -> Upon registration user's location at the time is stored permanenty and automatically
 -> A user has one profile (automatically created upon user registration)
@@ -45,13 +46,25 @@ Extras
 
 ADMIN
 -> Admin login
--> Admin can create managers and editors
+-> Admin can create madnagers and editors
 -> Admin can change blog settings
 -> Roles and Permissions
 -> Gates and Policies
 
 Managers
--> Managers can create editors and assign tasks (cannot manage posts)
+-> Managers can create categories
+-> Managers can create editors and assign tasks (cannot manage posts) (todo)
+
+Moderators
+-> Moderator answers user queries (todo)
 
 Editors
 -> Editors can moderate user post requests, issue them warning or ban them temporarily or permanently
+
+Admin Logic
+-> Super admin registration
+-> Super admin can create managers, moderators, editors
+-> Super admin has all permissions that managers, moderators and editors have
+-> Super admin also has permissions to change blog post names and such settings
+
+-> While super user creates managers, moderators or editors, super user isn't logged out

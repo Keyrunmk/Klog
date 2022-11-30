@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController as AuthLoginController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,41 +30,46 @@ Route::middleware("auth:sanctum")->get("/user", function (Request $request) {
     return $request->user();
 });
 
+Route::get("/custom", function(){
+    return response()->json([
+        "message" => "Yo, something's wrong with what you gave me",
+    ]);
+})->name("login");
+
 Route::get("/", [HomeController::class, "index"]);
 
 //login and registration
-Route::post("login", [LoginController::class, "login"])->middleware("guest");
-Route::post("register", [RegisterController::class, "register"])->middleware("guest");
+Route::post("login", [LoginController::class, "login"]);
+Route::post("register", RegisterController::class);
+Route::post("verify-email", AuthController::class)->middleware("auth:api");
 Route::post("logout", [LoginController::class, "logout"])->middleware("auth:api");
-Route::post("refresh", [LoginController::class, "refresh"])->middleware("auth:api");
+Route::post("refresh", [LoginController::class, "refreshToken"])->middleware("auth:api");
 
-//profile
-Route::prefix("profile")->middleware("auth:api")->group(function () {
-    Route::get("{profile}", [ProfileController::class, "show"])->middleware("can:view,profile");
-    Route::patch("{profile}", [ProfileController::class, "update"])->middleware("can:update,profile");
-});
+Route::middleware("auth:api")->group(function () {
+    //profile
+    Route::prefix("profile")->group(function () {
+        Route::get("{profile}", [ProfileController::class, "show"])->middleware("can:view,profile");
+        Route::patch("{profile}", [ProfileController::class, "update"])->middleware("can:update,profile");
+    });
 
-//posts
-Route::prefix("post")->middleware("auth:api")->group(function () {
-    Route::post("", [PostController::class, "store"]);
-    Route::patch("{post}", [PostController::class, "update"])->middleware("can:update,post");
-    Route::get("{post:slug}", [PostController::class, "show"])->middleware("can:show,post");
-    Route::delete("{post:slug}", [PostController::class, "destroy"]);
+    //posts
+    Route::prefix("post")->group(function () {
+        Route::get("", [PostController::class, "index"]);
+        Route::post("", [PostController::class, "store"]);
+        Route::patch("{post}", [PostController::class, "update"])->middleware("can:update,post");
+        Route::get("{post:slug}", [PostController::class, "show"])->middleware("can:view,post");
+        Route::delete("{post:slug}", [PostController::class, "destroy"]);
 
-    //comments
-    Route::post("{post:slug}/comment", [CommentController::class, "store"]);
-});
+        // Report Post
+        Route::post("{post:slug}/report", PostReportController::class);
 
-//categories
-Route::prefix("category")->middleware("auth:api")->group(function () {
-    Route::post("", [CategoryController::class, "store"]);
-    Route::patch("{category}", [CategoryController::class, "update"]);
-    Route::get("{category:slug}", [CategoryController::class, "show"]);
-    Route::delete("{category:slug}", [CategoryController::class, "destroy"]);
-});
+        //comments
+        Route::post("{post:slug}/comment", [CommentController::class, "store"]);
+    });
 
-//tags
-Route::prefix("tag")->middleware("auth:api")->group(function () {
-    Route::post("post/{post}", [TagController::class, "store"]);
-    Route::post("user/{user}", [HomeController::class, "store"]);
+    //tags
+    Route::prefix("tag")->group(function () {
+        Route::post("post/{post}", [TagController::class, "store"]);
+        Route::post("user/{user}", [HomeController::class, "store"]);
+    });
 });

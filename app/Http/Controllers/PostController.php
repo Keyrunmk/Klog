@@ -2,86 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\PostContract;
-use App\facades\UserLocation;
+use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
-use App\Models\Location;
+use App\Http\Resources\PostsCollection;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Intervention\Image\Facades\Image;
+use App\Services\PostService;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PostController extends Controller
 {
-    protected $postRepository;
+    protected PostService $postService;
 
-    public function __construct(PostContract $postRepository)
+    public function __construct(PostService $postService)
     {
-        $this->postRepository = $postRepository;
+        $this->postService = $postService;
     }
 
-    public function show(Post $post)
+    public function index(): ResourceCollection
+    {
+        $posts = $this->postService->index();
+
+        return new PostsCollection($posts);
+    }
+
+    public function show(Post $post): JsonResource
     {
         return new PostResource($post);
     }
 
-    public function store()
+    public function store(PostRequest $request): JsonResource
     {
-        $location = UserLocation::getCountryName();
-        $location_id = Location::where("country_name",$location)->value("id");
+        $request = $request->validated();
 
-        $attributes = array_merge($this->validatePost(), [
-            "user_id" => Auth::user()->id,
-            "location_id" => $location_id,
-        ]);
-
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
-
-        $post = $this->postRepository->createPost($attributes);
-
-        $post->image()->create(["path" => $imagePath]);
-
-        $post->location()->create(["country_name" => $location]);
+        $post = $this->postService->store($request);
 
         return new PostResource($post);
     }
 
-    public function update(Post $post)
+    public function update(Post $post, PostRequest $request): JsonResource
     {
-        $attributes = $this->validatePost($post);
+        $attributes = $request->validated();
 
-        $this->postRepository->updatePost($attributes, $post->id);
-
-        $post = $this->postRepository->findPost($post->id);
-
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
-
-        $post->image()->update(["path" => $imagePath]);
+        $post = $this->postService->update($post, $attributes);
 
         return new PostResource($post);
     }
 
-    public function destroy(Post $post)
+    public function destroy(Post $post): JsonResource
     {
         $post = $this->postRepository->deletePost($post->id);
 
         return new PostResource($post);
-    }
-
-    public function validatePost(?Post $post = null)
-    {
-        $post ??= new Post();
-
-        return request()->validate([
-            "title" => ["required", "max:255"],
-            "slug" => ["required", Rule::unique("posts", "slug")->ignore($post)],
-            "body" => ["required", "max:255"],
-            "category_id" => ["required", Rule::exists("categories", "id")],
-            "image" => ["nullable", "image"],
-        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Http\Resources\BaseResource;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -25,7 +26,7 @@ class ChooseNewUserTags
      */
     public function handle($event)
     {
-        return response()->json([
+        return new BaseResource([
             "redirect" => "Redirect to choose tags",
         ]);
     }

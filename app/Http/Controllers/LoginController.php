@@ -2,77 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
+use App\Http\Resources\BaseResource;
+use App\Http\Resources\LoginResource;
+use App\Services\UserService;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
-        $request->validate([
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-        ]);
-
-        $credentials = $request->only(['email', 'password']);
-
-        try {
-            $token = Auth::attempt($credentials);
-        } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()]);
-        }
-
-        if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        }
-
-        $user = Auth::user();
-
-        return response()->json([
-            'status' => 'success',
-            'user' => $user,
-            'authorization' => [
-                'token' => $token,
-                'type' => 'bearer'
-            ],
-        ]);
+        $this->userService = $userService;
+        $this->middleware("guest:api")->only("login");
     }
 
-
-
-    public function logout()
+    public function login(LoginRequest $request): JsonResource
     {
-        try {
-            Auth::logout();
-        } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()]);
+        $credentials = $request->validated();
+
+        $data = $this->userService->loginUser($credentials);
+
+        if ($data instanceof JsonResource) {
+            return $data;
         }
 
-        return response()->json([
+        return new LoginResource($data["user"], $data["token"]);
+    }
+
+    public function logout(): JsonResource
+    {
+        $this->userService->logoutUser();
+
+        return new BaseResource([
             'status' => 'success',
             'message' => 'Logged out successfully',
         ]);
     }
 
-    public function refresh()
+    public function refreshToken(): JsonResource
     {
-        try {
-            $newToken = Auth::refresh();
-        } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()]);
-        }
+        $newToken = $this->userService->refreshUserToken();
 
-        return response()->json([
-            'status' => 'success',
-            'user' => Auth::user(),
-            'authorization' => [
-                'token' => $newToken,
-                'type' => 'bearer'
-            ],
-        ]);
+        return new LoginResource(Auth::user(), $newToken);
     }
 }

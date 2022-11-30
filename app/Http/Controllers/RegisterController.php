@@ -2,41 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\UserContract;
 use App\Events\UserRegisteredEvent;
-use App\facades\UserLocation;
-use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
+use App\Exceptions\WebException;
+use App\Http\Requests\RegisterRequest;
+use App\Services\UserService;
+use Exception;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
-    protected UserRepository $userRepository;
+    protected UserService $userService;
 
-    public function __construct(UserContract $userRepository)
+    public function __construct(UserService $userService)
     {
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
     }
 
-    public function register()
+    public function __invoke(Request $request): mixed
     {
-        request()->validate([
-            "name" => ["required", "string", "max:255"],
-            "username" => ["required", "string", "max:255"],
-            "email" => ["required", "string", "email", "max:255", "unique:users,email"],
-            "password" => ["required", "string", "min:8"],
-            "status" => ["required", "string", Rule::in(["active"])],
-        ]);
-
-        $user = $this->userRepository->createUser([
-            "name" => request("name"),
-            "username" => request("username"),
-            "email" => request("email"),
-            "password" => Hash::make(request("password")),
-            "status" => request("status"),
-        ]);
-
-        $user->location()->create(["country_name" => UserLocation::getCountryName()]);
+        // $attributes = $request->validated();
+        try {
+            $user = $this->userService->registerUser($request->all());
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         return UserRegisteredEvent::dispatch($user);
     }

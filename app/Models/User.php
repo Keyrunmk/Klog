@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,11 +20,14 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        "name",
+        "first_name",
+        "last_name",
         "username",
         "email",
         "password",
-        "status"
+        "status",
+        "github_id",
+        "auth_type",
     ];
 
     /**
@@ -45,12 +49,20 @@ class User extends Authenticatable implements JWTSubject
         "email_verified_at" => "datetime",
     ];
 
-    public function getJWTIdentifier()
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     */
+    public function getJWTIdentifier(): mixed
     {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims()
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     */
+    public function getJWTCustomClaims(): mixed
     {
         return [];
     }

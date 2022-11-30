@@ -3,7 +3,10 @@
 namespace App\Repositories;
 
 use App\Contracts\BaseContract;
+use App\Exceptions\WebException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\QueryException;
 
 class BaseRepository implements BaseContract
 {
@@ -16,7 +19,11 @@ class BaseRepository implements BaseContract
 
     public function create(array $attributes): mixed
     {
-        return $this->model->create($attributes);
+        try {
+            return $this->model->create($attributes);
+        } catch (QueryException $e) {
+            throw $e;
+        }
     }
 
     public function update(array $attributes, int $id): mixed

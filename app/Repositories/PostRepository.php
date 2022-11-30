@@ -12,6 +12,11 @@ class PostRepository extends BaseRepository implements PostContract
         parent::__construct($model);
     }
 
+    public function allPosts(int $userId): mixed
+    {
+        return $this->all()->where("user_id", $userId);
+    }
+
     public function createPost(array $attributes): mixed
     {
         return $this->create($attributes);
