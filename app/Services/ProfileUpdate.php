@@ -7,6 +7,13 @@ use Intervention\Image\Facades\Image;
 
 class ProfileUpdate
 {
+    protected ImageService $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function __invoke(Profile $profile, array $attributes): Profile
     {
         $profile->update([
@@ -15,9 +22,7 @@ class ProfileUpdate
             "url" => $attributes["url"]
         ]);
 
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
+        $imagePath = $this->imageService->processImage();
 
         $user = auth()->user();
         if (!$user->image()->update(["path" => $imagePath])){

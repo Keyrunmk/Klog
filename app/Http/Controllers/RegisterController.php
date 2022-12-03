@@ -7,7 +7,6 @@ use App\Exceptions\WebException;
 use App\Http\Requests\RegisterRequest;
 use App\Services\UserService;
 use Exception;
-use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -18,11 +17,12 @@ class RegisterController extends Controller
         $this->userService = $userService;
     }
 
-    public function __invoke(Request $request): mixed
+    public function __invoke(RegisterRequest $request): mixed
     {
-        // $attributes = $request->validated();
+        $attributes = $request->validated();
+
         try {
-            $user = $this->userService->registerUser($request->all());
+            $user = $this->userService->registerUser($attributes);
         } catch (Exception $e) {
             throw new WebException($e->getCode(), $e->getMessage());
         }

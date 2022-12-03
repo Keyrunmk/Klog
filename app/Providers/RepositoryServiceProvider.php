@@ -4,11 +4,15 @@ namespace App\Providers;
 
 use App\Contracts\AdminContract;
 use App\Contracts\CategoryContract;
+use App\Contracts\CommentContract;
 use App\Contracts\PostContract;
+use App\Contracts\PostReport;
 use App\Contracts\TagContract;
 use App\Contracts\UserContract;
 use App\Repositories\AdminRepository;
 use App\Repositories\CategoryRepository;
+use App\Repositories\CommentRepository;
+use App\Repositories\PostReportRepository;
 use App\Repositories\PostRepository;
 use App\Repositories\TagRepository;
 use App\Repositories\UserRepository;
@@ -23,6 +27,8 @@ class RepositoryServiceProvider extends ServiceProvider
         PostContract::class => PostRepository::class,
         TagContract::class => TagRepository::class,
         CategoryContract::class => CategoryRepository::class,
+        PostReport::class => PostReportRepository::class,
+        CommentContract::class => CommentRepository::class,
     ];
 
     /**

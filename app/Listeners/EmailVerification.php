@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-class EmailVerification
+class EmailVerification implements ShouldQueue
 {
     /**
      * Create the event listener.

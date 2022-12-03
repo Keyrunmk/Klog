@@ -7,7 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
@@ -25,9 +25,6 @@ class User extends Authenticatable implements JWTSubject
         "username",
         "email",
         "password",
-        "status",
-        "github_id",
-        "auth_type",
     ];
 
     /**
@@ -36,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $hidden = [
+        "status",
         "password",
         "remember_token",
     ];

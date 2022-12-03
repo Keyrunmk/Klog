@@ -24,7 +24,7 @@ class AdminService
         $admin = $this->adminRepository->createAdmin($attributes);
 
         try {
-            $token = Auth::login($admin);
+            $token = Auth::guard("admin-api")->login($admin);
         } catch (JWTException $e) {
             return response()->json(["message" => $e->getMessage()]);
         }

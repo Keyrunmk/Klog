@@ -16,7 +16,7 @@ class LoginController extends Controller
     public function __construct(AdminService $adminService)
     {
         $this->adminService = $adminService;
-        // $this->middleware("guest:admin-api");
+        $this->middleware("auth:admin-api")->only("logout");
     }
 
     public function login(LoginRequest $request): JsonResource

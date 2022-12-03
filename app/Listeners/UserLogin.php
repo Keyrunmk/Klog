@@ -31,7 +31,7 @@ class UserLogin
     public function handle($event)
     {
         try {
-            $token = Auth::login($event->user);
+            $token = Auth::guard("api")->login($event->user);
         } catch (JWTException $e) {
             return new BaseResource(["message" => $e->getMessage()]);
         }

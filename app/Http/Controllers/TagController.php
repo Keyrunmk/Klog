@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\TagContract;
 use App\Models\Post;
-use App\Repositories\TagRepository;
+use App\Services\TagService;
 
 class TagController extends Controller
 {
-    protected TagRepository $tagRepository;
+    protected TagService $tagService;
 
-    public function __construct(TagContract $tagRepository)
+    public function __construct(TagService $tagService)
     {
-        $this->tagRepository = $tagRepository;
+        $this->tagService = $tagService;
     }
 
     public function store(Post $post)

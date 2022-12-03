@@ -9,7 +9,6 @@ use App\Services\ProfileUpdate;
 
 class ProfileController extends Controller
 {
-    protected $profileRepository;
     protected ProfileUpdate $profileUpdate;
 
     public function __construct(ProfileUpdate $profileUpdate)

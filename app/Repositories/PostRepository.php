@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\PostContract;
 use App\Models\Post;
+use Exception;
 
 class PostRepository extends BaseRepository implements PostContract
 {
@@ -14,26 +15,46 @@ class PostRepository extends BaseRepository implements PostContract
 
     public function allPosts(int $userId): mixed
     {
-        return $this->all()->where("user_id", $userId);
+        try {
+            return $this->all()->where("user_id", $userId);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function createPost(array $attributes): mixed
     {
-        return $this->create($attributes);
+        try {
+            return $this->create($attributes);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function updatePost(array $attributes, int $id): mixed
     {
-        return $this->update($attributes, $id);
+        try {
+            return $this->update($attributes, $id);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function deletePost(int $id): mixed
     {
-        return $this->delete($id);
+        try {
+            return $this->delete($id);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function findPost(int $id): mixed
     {
-        return $this->findOneOrFail($id);
+        try {
+            return $this->findOneOrFail($id);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 }

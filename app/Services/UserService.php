@@ -37,7 +37,7 @@ class UserService
     public function loginUser(array $credentials): JsonResource|array
     {
         try {
-            $token = Auth::attempt($credentials);
+            $token = Auth::guard("api-jwt")->attempt($credentials);
         } catch (JWTException $e) {
             return new BaseResource(['message' => $e->getMessage()]);
         }
@@ -50,7 +50,7 @@ class UserService
         };
 
         return [
-            "user" => Auth::user(),
+            "user" => Auth::guard("api-jwt")->user(),
             "token" => $token,
         ];
     }

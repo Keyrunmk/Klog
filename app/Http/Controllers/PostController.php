@@ -51,7 +51,7 @@ class PostController extends Controller
 
     public function destroy(Post $post): JsonResource
     {
-        $post = $this->postRepository->deletePost($post->id);
+        $this->postService->delete($post);
 
         return new PostResource($post);
     }

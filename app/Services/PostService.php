@@ -7,19 +7,21 @@ use App\facades\UserLocation;
 use App\Models\Location;
 use App\Models\Post;
 use App\Repositories\PostRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Intervention\Image\Facades\Image;
 
 class PostService
 {
     public PostRepository $postRepository;
+    public ImageService $imageService;
 
-    public function __construct(PostContract $postRepository)
+    public function __construct(PostContract $postRepository, ImageService $imageService)
     {
         $this->postRepository = $postRepository;
+        $this->imageService = $imageService;
     }
 
-    public function index(): Post
+    public function index(): Collection|Post
     {
         return $this->postRepository->allPosts(auth()->user()->id);
     }
@@ -30,13 +32,11 @@ class PostService
         $location_id = Location::where("country_name", $location)->value("id");
 
         $attributes = array_merge($attributes, [
-            "user_id" => Auth::user()->id,
+            "user_id" => Auth::guard("api-jwt")->user()->id,
             "location_id" => $location_id,
         ]);
 
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
+        $imagePath = $this->imageService->processImage();
 
         $post = $this->postRepository->createPost($attributes);
 
@@ -53,19 +53,15 @@ class PostService
 
         $post = $this->postRepository->findPost($post->id);
 
-        $post = $this->updateImage($post);
-
-        return $post;
-    }
-
-    public function updateImage(Post $post): Post
-    {
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
+        $imagePath = $this->imageService->processImage();
 
         $post->image()->update(["path" => $imagePath]);
 
         return $post;
+    }
+
+    public function delete(Post $post): bool
+    {
+        return $this->postRepository->deletePost($post->id);
     }
 }
