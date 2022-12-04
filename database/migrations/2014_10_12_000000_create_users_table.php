@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('github_id')->nullable();
-            $table->string('auth_type')->nullable();
             $table->string('password')->min(8);
             $table->string('status')->default("inactive");
             $table->rememberToken();

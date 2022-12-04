@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
-use App\Services\ProfileUpdate;
+use App\Services\ProfileService;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
     protected $profileRepository;
-    protected ProfileUpdate $profileUpdate;
+    protected ProfileService $profileService;
 
-    public function __construct(ProfileUpdate $profileUpdate)
+    public function __construct(ProfileService $profileService)
     {
-        $this->profileUpdate = $profileUpdate;
+        $this->profileService = $profileService;
     }
 
     public function show(Profile $profile): ProfileResource
@@ -22,11 +23,9 @@ class ProfileController extends Controller
         return new ProfileResource($profile);
     }
 
-    public function update(Profile $profile, ProfileRequest $request): mixed
+    public function update(Profile $profile, Request $request): mixed
     {
-        $attributes = $request->validated();
-
-        $profile = $this->profileUpdate->__invoke($profile, $attributes);
+        $profile = $this->profileService->__invoke($profile, $request);
 
         return new ProfileResource($profile);
     }

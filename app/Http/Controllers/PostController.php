@@ -7,6 +7,7 @@ use App\Http\Resources\PostResource;
 use App\Http\Resources\PostsCollection;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -31,20 +32,16 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    public function store(PostRequest $request): JsonResource
+    public function store(Request $request): JsonResource
     {
-        $request = $request->validated();
-
         $post = $this->postService->store($request);
 
         return new PostResource($post);
     }
 
-    public function update(Post $post, PostRequest $request): JsonResource
+    public function update(Post $post, Request $request): JsonResource
     {
-        $attributes = $request->validated();
-
-        $post = $this->postService->update($post, $attributes);
+        $post = $this->postService->update($post, $request);
 
         return new PostResource($post);
     }

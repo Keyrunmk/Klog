@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterRequest;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\Admin\AdminService;
@@ -16,6 +15,7 @@ class EditorController extends Controller
     public function __construct(AdminService $adminService)
     {
         $this->adminService = $adminService;
+        $this->middleware("permission:create-editor")->only("store");
     }
 
     public function show()
@@ -25,32 +25,30 @@ class EditorController extends Controller
         return response()->json($reports);
     }
 
-    public function store(RegisterRequest $request)
+    public function store(Request $request)
     {
-        $attributes = $request->validated();
-
-        $data = $this->adminService->editorRegister($attributes);
+        $data = $this->adminService->editorRegister($request);
 
         return response()->json([
-            "manager" => $data,
+            "status" => "Editor created successfully",
+            "editor" => $data,
         ]);
     }
 
-    public function delete(Post $post)
-    {
-        $post->delete();
+    // public function delete(Post $post)
+    // {
+    //     $post->delete();
 
-        return response()->json([
-            "status" => "Post delete successfully",
-        ]);
-    }
+    //     return response()->json([
+    //         "status" => "Post deleted successfully",
+    //     ]);
+    // }
 
-    public function warn(User $user, Request $request)
-    {
-        $user->status = "warned";
+    // public function warn(User $user, Request $request)
+    // {
+    //     $user->status = "warned";
+    //     $user->save();
 
-        $user->save();
-
-        dd($user->status);
-    }
+    //     dd($user->status);
+    // }
 }

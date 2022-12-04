@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasRolesAndPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +11,9 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class Admin extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRolesAndPermissions;
+
+    // protected $primaryKey = "email";
 
     protected $fillable = [
         "first_name",
@@ -46,5 +49,10 @@ class Admin extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): mixed
     {
         return [];
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, "admins_roles");
     }
 }

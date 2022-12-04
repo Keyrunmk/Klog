@@ -11,14 +11,4 @@ class AdminRepository extends BaseRepository implements AdminContract
     {
         parent::__construct($admin);
     }
-
-    public function createAdmin(array $attibutes): mixed
-    {
-        return $this->create($attibutes);
-    }
-
-    public function deleteAdmin(int $id): mixed
-    {
-        return $this->delete($id);
-    }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LoginRequest;
 use App\Http\Resources\BaseResource;
 use App\Http\Resources\LoginResource;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,11 +19,9 @@ class LoginController extends Controller
         $this->middleware("guest:api")->only("login");
     }
 
-    public function login(LoginRequest $request): JsonResource
+    public function login(Request $request): JsonResource
     {
-        $credentials = $request->validated();
-
-        $data = $this->userService->loginUser($credentials);
+        $data = $this->userService->login($request);
 
         if ($data instanceof JsonResource) {
             return $data;
@@ -34,7 +32,7 @@ class LoginController extends Controller
 
     public function logout(): JsonResource
     {
-        $this->userService->logoutUser();
+        $this->userService->logout();
 
         return new BaseResource([
             'status' => 'success',
@@ -44,7 +42,7 @@ class LoginController extends Controller
 
     public function refreshToken(): JsonResource
     {
-        $newToken = $this->userService->refreshUserToken();
+        $newToken = $this->userService->refreshToken();
 
         return new LoginResource(Auth::user(), $newToken);
     }

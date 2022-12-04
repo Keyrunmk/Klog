@@ -15,25 +15,15 @@ class PermissionSeeder extends Seeder
      */
     public function run()
     {
+        $editor = new Permission();
+        $editor->name = "Create Editor";
+        $editor->slug = "create-editor";
+        $editor->save();
+
         $manageUser = new Permission();
         $manageUser->name = 'Manage users';
         $manageUser->slug = 'manage-users';
         $manageUser->save();
-
-        $createManager = new Permission();
-        $createManager->name = "Create Manager";
-        $createManager->slug = "create-manager";
-        $createManager->save();
-
-        $createModerator = new Permission();
-        $createModerator->name = "Create Moderator";
-        $createModerator->slug = "create-moderator";
-        $createModerator->save();
-
-        $createEditor = new Permission();
-        $createEditor->name = "Create Editor";
-        $createEditor->slug = "create-editor";
-        $createEditor->save();
 
         $createTasks = new Permission();
         $createTasks->name = 'Create Tasks';
@@ -43,5 +33,21 @@ class PermissionSeeder extends Seeder
         $deletePost = new Permission();
         $deletePost->name = "Delete Post";
         $deletePost->slug = "delete-post";
+        $deletePost->save();
+
+        $issueWawrning = new Permission();
+        $issueWawrning->name = "Issue Warning";
+        $issueWawrning->slug = "issue-warning";
+        $issueWawrning->save();
+
+        $issueBan = new Permission();
+        $issueBan->name = "Issue Ban";
+        $issueBan->slug = "issue-ban";
+        $issueBan->save();
+
+        $issueSuspension = new Permission();
+        $issueSuspension->name = "Issue Suspension";
+        $issueSuspension->slug = "issue-suspension";
+        $issueSuspension->save();
     }
 }

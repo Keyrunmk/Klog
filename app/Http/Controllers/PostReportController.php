@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostReportRequest;
 use App\Models\Post;
+use App\Services\PostReportService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PostReportController extends Controller
 {
-    public function __invoke(Post $post, PostReportRequest $request): JsonResponse
-    {
-        $attributes = array_merge($request->validated(), [
-            "post_id" => $post->id,
-            "user_id" => auth()->user()->id,
-        ]);
+    protected PostReportService $postReportService;
 
-        $post = $post->postReports()->create($attributes);
+    public function __construct(PostReportService $postReportService)
+    {
+        $this->postReportService = $postReportService;
+    }
+
+    public function __invoke(Post $post, Request $request): JsonResponse
+    {
+        $post = $this->postReportService->create($post, $request);
 
         if ($post) {
             return response()->json([

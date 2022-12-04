@@ -3,17 +3,24 @@
 namespace App\Services;
 
 use App\Models\Profile;
+use App\Validations\ProfileUpdate;
+use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 
-class ProfileUpdate
+class ProfileService
 {
-    public function __invoke(Profile $profile, array $attributes): Profile
+    protected ProfileUpdate $profileValidate;
+
+    public function __construct(ProfileUpdate $profileValidate)
     {
-        $profile->update([
-            "title" => $attributes["title"],
-            "description" => $attributes["description"],
-            "url" => $attributes["url"]
-        ]);
+        $this->profileValidate = $profileValidate;
+    }
+
+    public function __invoke(Profile $profile, Request $request): Profile
+    {
+        $attributes = $this->profileValidate->run($request);
+
+        $profile->update($attributes);
 
         $imagePath = request("image")->store("uploads", "public");
         $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);

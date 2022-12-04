@@ -3,84 +3,79 @@
 namespace App\Services\Admin;
 
 use App\Contracts\AdminContract;
-use App\Http\Resources\BaseResource;
 use App\Models\PostReport;
+use App\Models\Role;
 use App\Repositories\AdminRepository;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
-use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
+use App\Validations\AdminRegister;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminService
 {
     public AdminRepository $adminRepository;
+    public AdminRegister $validateRegister;
+    public RoleService $roleService;
+    public PermissionService $permissionService;
+    public Role $roleModel;
+    public array $permissionModels;
 
-    public function __construct(AdminContract $adminRepository)
-    {
+    public function __construct(
+        AdminContract $adminRepository,
+        AdminRegister $validateRegister,
+        RoleService $roleService,
+        PermissionService $permissionService
+    ) {
         $this->adminRepository = $adminRepository;
+        $this->validateRegister = $validateRegister;
+        $this->roleService = $roleService;
+        $this->permissionService = $permissionService;
     }
-
-    public function adminRegister(array $attributes): mixed
-    {
-        $admin = $this->adminRepository->createAdmin($attributes);
-
-        try {
-            $token = Auth::login($admin);
-        } catch (JWTException $e) {
-            return response()->json(["message" => $e->getMessage()]);
-        }
-
-        return [
-            "admin" => $admin,
-            "token" => $token,
-        ];
-    }
-
-    public function adminLogin(array $attributes): JsonResource|array
-    {
-        try {
-            $token = Auth::guard("admin-api")->attempt($attributes);
-        } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
-        }
-
-        if (!$token) {
-            return new BaseResource([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        };
-
-        return [
-            "user" => Auth::guard("admin-api")->user(),
-            "token" => $token,
-        ];
-    }
-
-    public function adminLogout()
-    {
-        try {
-            Auth::guard("admin-api")->logout();
-        } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
-        }
-    }
-
 
     public function showReports()
     {
         return PostReport::all();
     }
 
-    public function managerRegister(array $attributes): mixed
+    public function managerRegister(Request $request): mixed
     {
-        $admin = $this->adminRepository->createAdmin($attributes);
+        $attributes = $this->validateRegister->run($request);
+
+        try {
+            foreach ($this->roleService->roles as $role) {
+                if ($role->slug === "page-manager") {
+                    $this->roleModel = $role;
+                    break;
+                }
+            }
+
+            foreach ($this->permissionService->permissions as $permission) {
+                if ($permission->slug === "manage-users" || $permission->slug === "create-tasks") {
+                    $this->permissionModels[] = $permission;
+                }
+            }
+
+            DB::beginTransaction();
+
+            $admin = $this->adminRepository->create($attributes);
+            $this->roleModel->permissions()->saveMany($this->permissionModels);
+            $admin->roles()->save($this->roleModel);
+
+
+            DB::commit();
+        } catch (Exception $e) {
+                //implemnt db::intransaction() using macros
+                DB::rollBack();
+            return $e;
+        }
 
         return $admin;
     }
 
-    public function editorRegister(array $attributes): mixed
+    public function editorRegister(Request $request): mixed
     {
-        $editor = $this->adminRepository->createAdmin($attributes);
+        $attributes = $this->validateRegister->run($request);
+        $editor = $this->adminRepository->create($attributes);
 
         return $editor;
     }

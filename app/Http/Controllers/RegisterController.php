@@ -20,9 +20,8 @@ class RegisterController extends Controller
 
     public function __invoke(Request $request): mixed
     {
-        // $attributes = $request->validated();
         try {
-            $user = $this->userService->registerUser($request->all());
+            $user = $this->userService->register($request);
         } catch (Exception $e) {
             throw new WebException($e->getCode(), $e->getMessage());
         }

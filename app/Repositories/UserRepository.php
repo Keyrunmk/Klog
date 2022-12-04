@@ -12,13 +12,4 @@ class UserRepository extends BaseRepository implements UserContract
     {
         parent::__construct($model);
     }
-
-    public function createUser(array $attibutes): mixed
-    {
-        try {
-            return $this->create($attibutes);
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
 }

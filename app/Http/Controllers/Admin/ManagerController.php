@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Models\Admin;
 use App\Services\Admin\AdminService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ManagerController extends Controller
 {
@@ -14,22 +16,22 @@ class ManagerController extends Controller
     public function __construct(AdminService $adminService)
     {
         $this->adminService = $adminService;
+        $this->middleware("role:page-admin")->only("store");
     }
 
-    public function show(Admin $admin)
+    public function show(Admin $admin): JsonResponse
     {
         return response()->json([
             "moderator" => $admin
         ]);
     }
 
-    public function store(RegisterRequest $request)
+    public function store(Request $request)
     {
-        $attributes = $request->validated();
-
-        $data = $this->adminService->managerRegister($attributes);
+        $data = $this->adminService->managerRegister($request);
 
         return response()->json([
+            "status" => "Manager created successfully",
             "manager" => $data,
         ]);
     }

@@ -15,11 +15,6 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-        $admin = new Role();
-        $admin->name = "Page Admin";
-        $admin->slug = "page-admin";
-        $admin->save();
-
         $manager = new Role();
         $manager->name = "Page Manager";
         $manager->slug = "page-manager";
@@ -28,9 +23,11 @@ class RoleSeeder extends Seeder
         $moderator = new Role();
         $moderator->name = "Page Moderator";
         $moderator->slug = "page-moderator";
+        $moderator->save();
 
         $editor = new Role();
         $editor->name = "Page Editor";
         $editor->slug = "page-editor";
+        $editor->save();
     }
 }

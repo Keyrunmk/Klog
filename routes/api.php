@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController as AuthLoginController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
@@ -13,7 +11,6 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Socialite\Facades\Socialite;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +27,7 @@ Route::middleware("auth:sanctum")->get("/user", function (Request $request) {
     return $request->user();
 });
 
-Route::get("/custom", function(){
+Route::get("/custom", function () {
     return response()->json([
         "message" => "Yo, something's wrong with what you gave me",
     ]);
@@ -53,12 +50,12 @@ Route::middleware("auth:api")->group(function () {
     });
 
     //posts
-    Route::prefix("post")->group(function () {
-        Route::get("", [PostController::class, "index"]);
-        Route::post("", [PostController::class, "store"]);
-        Route::patch("{post}", [PostController::class, "update"])->middleware("can:update,post");
-        Route::get("{post:slug}", [PostController::class, "show"])->middleware("can:view,post");
-        Route::delete("{post:slug}", [PostController::class, "destroy"]);
+    Route::prefix("post")->middleware("auth:api")->controller(PostController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::patch("{post}", "update")->middleware("can:update,post");
+        Route::get("{post:slug}", "show")->middleware("can:view,post");
+        Route::delete("{post:slug}", "destroy");
 
         // Report Post
         Route::post("{post:slug}/report", PostReportController::class);

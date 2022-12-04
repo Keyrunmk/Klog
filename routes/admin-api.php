@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get("/custom", function(){
+Route::get("/custom", function () {
     return response()->json([
         "message" => "yo man ! u need to login",
     ]);
@@ -28,17 +28,17 @@ Route::get("/custom", function(){
 //login and registration
 Route::post("login", [LoginController::class, "login"]);
 Route::post("logout", [LoginController::class, "logout"])->middleware("auth:admin-api");
-Route::post("register", RegisterController::class);
 
 Route::middleware("auth:admin-api")->group(function () {
+    Route::post("register", RegisterController::class);
     // Manager
-    Route::prefix("manager")->group(function(){
+    Route::prefix("manager")->group(function () {
         Route::post("", [ManagerController::class, "store"]);
         Route::get("{admin}", [ManagerController::class, "show"]);
     });
 
     // Editor
-    Route::prefix("editor")->group(function(){
+    Route::prefix("editor")->group(function () {
         Route::post("", [EditorController::class, "store"]);
         Route::get("reports", [EditorController::class, "show"]);
         // show user some message using listener when their post is deleted
@@ -47,7 +47,7 @@ Route::middleware("auth:admin-api")->group(function () {
     });
 
     // Moderator
-    Route::prefix("moderator")->group(function(){
+    Route::prefix("moderator")->group(function () {
         Route::post("", [ModeratorController::class, "store"]);
     });
 

@@ -3,12 +3,16 @@
 namespace App\Services;
 
 use App\Models\UserVerification;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 
 class UserVerify
 {
-    public function __invoke(array $request): string
+    public function __invoke(Request $request): string
     {
+        $request = $request->validate([
+            "token" => ["required","string"],
+        ]);
+
         $verifyUser = UserVerification::where("token", $request["token"])->first();
         $message = "Sorry, your email cannot be verified.";
 

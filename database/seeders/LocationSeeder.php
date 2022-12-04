@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 
 class LocationSeeder extends Seeder
 {
-    protected $settings = [
+    protected $countries = [
         ["country_name" => "World"],
         ["country_name" => "Nepal"],
         ["country_name" => "India"],
@@ -23,6 +23,6 @@ class LocationSeeder extends Seeder
      */
     public function run()
     {
-        Location::insert($this->settings);
+        Location::insert($this->countries);
     }
 }

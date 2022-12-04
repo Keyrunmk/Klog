@@ -26,8 +26,8 @@ class AdminResource extends JsonResource
     {
         return [
             "status" => "success",
-            "message" => "User created successfully",
-            "user" => $this->admin,
+            "message" => "Admin created successfully",
+            "admin" => $this->admin,
             "authorization" => [
                 "token" => $this->token,
                 "type" => "bearer"

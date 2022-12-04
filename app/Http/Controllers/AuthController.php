@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserVerifyRequest;
 use App\Http\Resources\BaseResource;
 use App\Services\UserVerify;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthController extends Controller
@@ -16,10 +16,8 @@ class AuthController extends Controller
         $this->userVerify = $userVerify;
     }
 
-    public function __invoke(UserVerifyRequest $request): JsonResource
+    public function __invoke(Request $request): JsonResource
     {
-        $request = $request->validated();
-
         $message = $this->userVerify->__invoke($request);
 
         return new BaseResource([

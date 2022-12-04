@@ -6,6 +6,7 @@ use App\Http\Requests\CommentRequest;
 use App\Http\Resources\CommentResource;
 use App\Models\Post;
 use App\Services\CommentService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,11 +19,9 @@ class CommentController extends Controller
         $this->commentService = $commentService;
     }
 
-    public function store(Post $post, CommentRequest $request): JsonResource
+    public function store(Post $post, Request $request): JsonResource
     {
-        $attributes = $request->validated();
-
-        $comments = $this->commentService->__invoke($post, $attributes);
+        $comments = $this->commentService->__invoke($post, $request);
 
         return new CommentResource($comments);
     }
