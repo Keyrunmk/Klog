@@ -100,4 +100,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(Location::class, "locationable");
     }
+
+    public function following()
+    {
+        return $this->belongsToMany(Profile::class);
+    }
 }

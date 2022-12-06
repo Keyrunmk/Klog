@@ -32,17 +32,25 @@ Images
 -> Image can belong to Posts and User(Profile)
 
 WEB
--> Home Page (show posts on the basis of location if user is not registered else display posts of tags user chose during registration)
--> Before registration completes, user is made to agree policies (if agreed status is active, if not can't register)
--> After user registration, user can choose tags of stuffs that user likes
+-> Home Page (show posts on the basis of location if user is not registered else display posts of tags user chose during registration) --todo
+-> Before registration completes, user is made to agree policies (if agreed status is active, if not can't register) --todo
+-> After user registration, user can choose tags of stuffs that user likes --todo
 -> After user registration, send email (Events and listeners)
--> Cache, Jobs and queues
 -> Repositories
 -> Tried to follow SOLID principles
--> Search (using:["post.names", "author.name", "category" ,"#tags"])
+-> Search (using:["post.names", "author.name", "category" ,"#tags"]) --todo
 
 Extras
--> A post can be reported for violating blog policies (user status may be banned or warned - two warnings is banned)
+-> A post can be reported for violating blog policies (user status may be banned or warned - two warnings is banned) --todo
+-> Switchd from laragon to docker/ laravel sail
+-> Cache, Jobs and queues --todo
+-> Query optimization and database techniques --todo
+-> jwt for admin
+-> laravel passport/jwt for users --todo
+-> socailite --todo
+-> laravel octane --todo
+-> macros
+-> enum
 
 ADMIN
 -> Admin login
@@ -52,14 +60,14 @@ ADMIN
 -> Gates and Policies
 
 Managers
--> Managers can create categories
--> Managers can create editors and assign tasks (cannot manage posts) (todo)
+-> Managers can create categories --todo
+-> Managers can create editors and assign tasks (cannot manage posts) --todo
 
 Moderators
--> Moderator answers user queries (todo)
+-> Moderator answers user queries --todo
 
 Editors
--> Editors can moderate user post requests, issue them warning or ban them temporarily or permanently
+-> Editors can moderate user post requests, issue them warning or ban them temporarily or permanently  --todo
 
 Admin Logic
 -> Super admin registration

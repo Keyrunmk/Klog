@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
@@ -47,6 +48,7 @@ Route::middleware("auth:api")->group(function () {
     Route::prefix("profile")->group(function () {
         Route::get("{profile}", [ProfileController::class, "show"])->middleware("can:view,profile");
         Route::patch("{profile}", [ProfileController::class, "update"])->middleware("can:update,profile");
+        Route::post("{user}", FollowController::class);
     });
 
     //posts
