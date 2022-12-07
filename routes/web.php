@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     dump(phpinfo());
 });
+
+Route::get('/sentry-test', function () {
+    throw new \Exception("Sentry Test Exception");
+});

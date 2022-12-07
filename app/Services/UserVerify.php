@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enum\UserStatusEnum;
 use App\Models\UserVerification;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,7 @@ class UserVerify
 
             if (!$user->email_verified_at) {
                 $user->email_verified_at = now();
-                $user->status = "active";
+                $user->status = UserStatusEnum::Active;
                 $user->save();
                 $message = "Your email is now verified.";
             }

@@ -53,7 +53,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['single','sentry'],
             'ignore_exceptions' => false,
         ],
 
@@ -97,6 +97,12 @@ return [
             'with' => [
                 'stream' => 'php://stderr',
             ],
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level'  => null,
+            'bubble' => true,
         ],
 
         'syslog' => [

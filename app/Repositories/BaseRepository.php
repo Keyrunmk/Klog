@@ -66,7 +66,7 @@ class BaseRepository implements BaseContract
     public function findBy(array $data): mixed
     {
         try {
-            return $this->model->where($data)->all();
+            return $this->model->where($data)->get();
         } catch (Exception $e) {
             throw $e;
         }
