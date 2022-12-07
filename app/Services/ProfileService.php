@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Profile;
 use App\Validations\ProfileUpdate;
+use Exception;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 
@@ -18,17 +19,21 @@ class ProfileService
 
     public function __invoke(Profile $profile, Request $request): Profile
     {
-        $attributes = $this->profileValidate->run($request);
+        try {
+            $attributes = $this->profileValidate->run($request);
 
-        $profile->update($attributes);
+            $profile->update($attributes);
 
-        $imagePath = request("image")->store("uploads", "public");
-        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-        $image->save();
+            $imagePath = request("image")->store("uploads", "public");
+            $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
+            $image->save();
 
-        $user = auth()->user();
-        if (!$user->image()->update(["path" => $imagePath])){
-            $user->image()->create(["path" => $imagePath]);
+            $user = auth()->user();
+            if (!$user->image()->update(["path" => $imagePath])) {
+                $user->image()->create(["path" => $imagePath]);
+            }
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return $profile;

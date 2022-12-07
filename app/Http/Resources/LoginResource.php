@@ -2,16 +2,15 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LoginResource extends JsonResource
 {
-    public User|Admin $model;
+    public User $model;
     public string $token;
 
-    public function __construct(User|Admin $model, string $token)
+    public function __construct(User $model, string $token = "")
     {
         $this->model = $model;
         $this->token = $token;
@@ -25,11 +24,13 @@ class LoginResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'status' => 'success',
-            'model' => $this->model,
-            'authorization' => [
-                'token' => $this->token,
-                'type' => 'bearer'
+            "status" => "success",
+            "model" => get_class($this->model),
+            "username" => $this->model->username,
+            "email" => $this->model->email,
+            "authorization" => [
+                "token" => $this->token,
+                "type" => "bearer"
             ],
         ];
     }

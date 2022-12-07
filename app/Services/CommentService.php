@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Validations\CommentValidation;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,10 +22,14 @@ class CommentService
     {
         $attributes = $this->commentValidation->run($request);
 
-        $post->comments()->create([
-            "user_id" => Auth::user()->id,
-            "body" => $attributes["body"],
-        ]);
+        try {
+            $post->comments()->create([
+                "user_id" => Auth::user()->id,
+                "body" => $attributes["body"],
+            ]);
+        } catch (Exception $e) {
+            throw $e;
+        }
 
         return $post->comments;
     }

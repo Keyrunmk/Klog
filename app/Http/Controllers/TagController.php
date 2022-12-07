@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\TagContract;
+use App\Exceptions\WebException;
 use App\Models\Post;
 use App\Repositories\TagRepository;
+use Exception;
 
 class TagController extends Controller
 {
@@ -21,7 +23,11 @@ class TagController extends Controller
             "name" => ["required", "string"],
         ]);
 
-        $tag = $post->tags()->create($attributes);
+        try {
+            $tag = $post->tags()->create($attributes);
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         return response()->json([
             "status" => "success",

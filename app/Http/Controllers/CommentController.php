@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CommentRequest;
+use App\Exceptions\WebException;
 use App\Http\Resources\CommentResource;
 use App\Models\Post;
 use App\Services\CommentService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
@@ -21,7 +21,11 @@ class CommentController extends Controller
 
     public function store(Post $post, Request $request): JsonResource
     {
-        $comments = $this->commentService->__invoke($post, $request);
+        try {
+            $comments = $this->commentService->__invoke($post, $request);
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         return new CommentResource($comments);
     }

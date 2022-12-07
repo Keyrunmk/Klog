@@ -11,16 +11,24 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $location = auth()->user()->location->first();
-        $posts = $location->posts()->get();
+        if (auth()->user ?? false) {
+            $location = auth()->user()->location->first();
+            $authPosts = $location->posts()->get();
 
-        $userTags = auth()->user()->tags()->get();
+            $userTags = auth()->user()->tags()->get();
 
-        foreach ($userTags as $tag) {
-            $posts->add($tag->posts);
+            foreach ($userTags as $tag) {
+                $authPosts->add($tag->posts);
+            }
         }
 
-        return new PostsCollection($posts);
+        $posts = Post::latest()->filter(request(["search"]))->get();
+
+        if ($authPosts ?? false) {
+            $posts->add($authPosts);
+        }
+
+        return response()->json($posts);
     }
 
     public function store(User $user)

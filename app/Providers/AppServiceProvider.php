@@ -9,6 +9,8 @@ use App\Http\Resources\LoginResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\ProfileResource;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,5 +39,12 @@ class AppServiceProvider extends ServiceProvider
         PostResource::withoutWrapping();
         CommentResource::withoutWrapping();
         CategoryResource::withoutWrapping();
+
+        DB::listen(function ($query) {
+            File::append(
+                storage_path("/logs/query.log"),
+                $query->sql . " [" . implode(", ", $query->bindings) . "]" . PHP_EOL
+            );
+        });
     }
 }

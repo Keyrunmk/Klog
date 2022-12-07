@@ -5,6 +5,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Oauth\CallbackController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostReportController;
 use App\Http\Controllers\ProfileController;
@@ -34,6 +35,24 @@ Route::get("/custom", function () {
     ]);
 })->name("login");
 
+// passport
+Route::get("/redirect", function (Request $request) {
+
+    $query = http_build_query([
+        "client_id" => "1",
+        "redirect_uri" => "http://localhost/api/callback",
+        "response_type" => "code",
+        "scope" => "",
+        "state" => "",
+        "prompt" => "login", // "none", "consent", or "login"
+    ]);
+
+    return redirect("http://localhost:3001/oauth/authorize?".$query);
+});
+
+Route::get("callback", CallbackController::class);
+
+// Home
 Route::get("/", [HomeController::class, "index"]);
 
 //login and registration

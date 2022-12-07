@@ -2,11 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Http\Resources\BaseResource;
-use App\Mail\WelcomeNewUserMail;
+use App\Jobs\WelcomeUserEmailJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Mail;
 
 class SendWelcomeEmail
 {
@@ -28,9 +26,6 @@ class SendWelcomeEmail
      */
     public function handle($event)
     {
-        Mail::to($event->user->email)->send(new WelcomeNewUserMail());
-        return new BaseResource([
-            "mail_status" => "sent",
-        ]);
+        dispatch(new WelcomeUserEmailJob($event->user));
     }
 }
