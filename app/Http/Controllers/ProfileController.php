@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileRequest;
+use App\Exceptions\WebException;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
 use App\Services\ProfileService;
+use Exception;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -25,7 +26,11 @@ class ProfileController extends Controller
 
     public function update(Profile $profile, Request $request): mixed
     {
-        $profile = $this->profileService->__invoke($profile, $request);
+        try {
+            $profile = $this->profileService->__invoke($profile, $request);
+        } catch (Exception $e) {
+            throw new WebException($e->getCode() ,$e->getMessage());
+        }
 
         return new ProfileResource($profile);
     }

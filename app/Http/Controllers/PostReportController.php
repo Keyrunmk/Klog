@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\WebException;
 use App\Models\Post;
 use App\Services\PostReportService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +20,11 @@ class PostReportController extends Controller
 
     public function __invoke(Post $post, Request $request): JsonResponse
     {
-        $post = $this->postReportService->create($post, $request);
+        try {
+            $post = $this->postReportService->create($post, $request);
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         if ($post) {
             return response()->json([

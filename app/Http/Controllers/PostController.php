@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostRequest;
+use App\Exceptions\WebException;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\PostsCollection;
 use App\Models\Post;
 use App\Services\PostService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -22,7 +23,11 @@ class PostController extends Controller
 
     public function index(): ResourceCollection
     {
-        $posts = $this->postService->index();
+        try {
+            $posts = $this->postService->index();
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         return new PostsCollection($posts);
     }
@@ -34,21 +39,33 @@ class PostController extends Controller
 
     public function store(Request $request): JsonResource
     {
-        $post = $this->postService->store($request);
+        try {
+            $post = $this->postService->store($request);
+        } catch (Exception $e) {
+            throw new WebException($e->getCode(), $e->getMessage());
+        }
 
         return new PostResource($post);
     }
 
     public function update(Post $post, Request $request): JsonResource
     {
-        $post = $this->postService->update($post, $request);
+        try {
+            $post = $this->postService->update($post, $request);
+        } catch (Exception $e) {
+            return new WebException($e->getCode(), $e->getMessage());
+        }
 
         return new PostResource($post);
     }
 
     public function destroy(Post $post): JsonResource
     {
-        $post = $this->postRepository->deletePost($post->id);
+        try {
+            $post = $this->postRepository->deletePost($post->id);
+        } catch (Exception $e) {
+            return new WebException($e->getCode(), $e->getMessage());
+        }
 
         return new PostResource($post);
     }

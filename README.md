@@ -32,25 +32,25 @@ Images
 -> Image can belong to Posts and User(Profile)
 
 WEB
--> Home Page (show posts on the basis of location if user is not registered else display posts of tags user chose during registration) --todo
--> Before registration completes, user is made to agree policies (if agreed status is active, if not can't register) --todo
--> After user registration, user can choose tags of stuffs that user likes --todo
+-> Home Page (show posts on the basis of location)
 -> After user registration, send email (Events and listeners)
 -> Repositories
 -> Tried to follow SOLID principles
--> Search (using:["post.names", "author.name", "category" ,"#tags"]) --todo
+-> Search (using:["post.names", "author.name", "category" ,"#tags"])
 
 Extras
--> A post can be reported for violating blog policies (user status may be banned or warned - two warnings is banned) --todo
 -> Switchd from laragon to docker/ laravel sail
--> Cache, Jobs and queues --todo
+-> Cache, Jobs and queues
 -> Query optimization and database techniques --todo
 -> jwt for admin
 -> laravel passport/jwt for users --todo
+-> api documentation in redocly --todo
 -> socailite --todo
+-> switched to laravel sail
 -> laravel octane --todo
--> macros
+-> macros --todo
 -> enum
+-> switch to uuid
 
 ADMIN
 -> Admin login
@@ -60,14 +60,13 @@ ADMIN
 -> Gates and Policies
 
 Managers
--> Managers can create categories --todo
--> Managers can create editors and assign tasks (cannot manage posts) --todo
+-> Managers has manager role and permission
 
 Moderators
--> Moderator answers user queries --todo
+-> Moderator has moderator role and permission
 
 Editors
--> Editors can moderate user post requests, issue them warning or ban them temporarily or permanently  --todo
+-> Editors has editor role and permission
 
 Admin Logic
 -> Super admin registration
