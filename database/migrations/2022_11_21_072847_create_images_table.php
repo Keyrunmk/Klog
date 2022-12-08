@@ -19,6 +19,8 @@ return new class extends Migration
             $table->unsignedBigInteger("imageable_id");
             $table->string("imageable_type");
             $table->timestamps();
+
+            $table->index(["path","imageable_id", "imageable_type"]);
         });
     }
 

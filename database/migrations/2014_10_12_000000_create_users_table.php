@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('status')->default("inactive");
             $table->rememberToken();
             $table->timestamps();
+
+            $table->index(["status"]);
         });
     }
 

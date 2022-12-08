@@ -44,7 +44,7 @@ Route::get("/redirect", function (Request $request) {
         "response_type" => "code",
         "scope" => "",
         "state" => "",
-        "prompt" => "login", // "none", "consent", or "login"
+        "prompt" => "consent", // "none", "consent", or "login"
     ]);
 
     return redirect("http://localhost:3001/oauth/authorize?".$query);

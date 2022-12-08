@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
-use App\Exceptions\WebException;
-use App\Http\Requests\RegisterRequest;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\Request;
 
-class RegisterController extends Controller
+class RegisterController extends BaseController
 {
     protected UserService $userService;
 
@@ -18,12 +16,12 @@ class RegisterController extends Controller
         $this->userService = $userService;
     }
 
-    public function __invoke(Request $request): mixed
+    public function register(Request $request): mixed
     {
         try {
             $user = $this->userService->register($request);
         } catch (Exception $e) {
-            throw new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getCode(), $e->getMessage());
         }
 
         return UserRegisteredEvent::dispatch($user);
