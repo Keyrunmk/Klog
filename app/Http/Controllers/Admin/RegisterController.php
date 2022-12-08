@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\AdminResource;
+use App\Http\Controllers\BaseController;
 use App\Services\Admin\AuthenticationService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class RegisterController extends Controller
+class RegisterController extends BaseController
 {
     public AuthenticationService $authenticationService;
 
@@ -18,10 +18,14 @@ class RegisterController extends Controller
         $this->middleware("role:page-admin");
     }
 
-    public function __invoke(Request $request): JsonResource
+    public function register(Request $request): JsonResponse
     {
-        $data = $this->authenticationService->register($request);
+        try {
+            $token = $this->authenticationService->register($request);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getCode());
+        }
 
-        return new AdminResource($data["admin"], $data["token"]);
+        return $this->successResponse($token);
     }
 }

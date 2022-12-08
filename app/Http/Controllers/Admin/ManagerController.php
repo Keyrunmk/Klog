@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\AdminResource;
 use App\Models\Admin;
 use App\Services\Admin\AdminService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ManagerController extends Controller
 {
@@ -19,11 +20,9 @@ class ManagerController extends Controller
         $this->middleware("role:page-admin")->only("store");
     }
 
-    public function show(Admin $admin): JsonResponse
+    public function show(Admin $admin): JsonResource
     {
-        return response()->json([
-            "moderator" => $admin
-        ]);
+        return new AdminResource($admin);
     }
 
     public function store(Request $request)

@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FollowController extends Controller
+class FollowController extends BaseController
 {
-    public function __invoke(User $user): array
+    public function follow(User $user): array
     {
         return auth()->user()->following()->toggle($user);
     }

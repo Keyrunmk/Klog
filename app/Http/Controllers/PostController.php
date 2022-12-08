@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\WebException;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\PostsCollection;
 use App\Models\Post;
 use App\Services\PostService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class PostController extends Controller
+class PostController extends BaseController
 {
     protected PostService $postService;
 
@@ -21,12 +21,12 @@ class PostController extends Controller
         $this->postService = $postService;
     }
 
-    public function index(): ResourceCollection
+    public function index(): ResourceCollection|JsonResponse
     {
         try {
             $posts = $this->postService->index();
         } catch (Exception $e) {
-            throw new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
         return new PostsCollection($posts);
@@ -37,34 +37,34 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    public function store(Request $request): JsonResource
+    public function store(Request $request): JsonResource|JsonResponse
     {
         try {
             $post = $this->postService->store($request);
         } catch (Exception $e) {
-            throw new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
         return new PostResource($post);
     }
 
-    public function update(Post $post, Request $request): JsonResource
+    public function update(Post $post, Request $request): JsonResource|JsonResponse
     {
         try {
             $post = $this->postService->update($post, $request);
         } catch (Exception $e) {
-            return new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
         return new PostResource($post);
     }
 
-    public function destroy(Post $post): JsonResource
+    public function destroy(Post $post): JsonResource|JsonResponse
     {
         try {
             $post = $this->postRepository->deletePost($post->id);
         } catch (Exception $e) {
-            return new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
         return new PostResource($post);

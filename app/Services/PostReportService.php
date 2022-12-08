@@ -15,7 +15,7 @@ class PostReportService
         $this->postReportValidation = $postReportValidation;
     }
 
-    public function create(Post $post, Request $request)
+    public function create(Post $post, Request $request): bool
     {
         $attributes = $this->postReportValidation->run($request);
         $attributes = array_merge($request->validated(), [
@@ -25,6 +25,10 @@ class PostReportService
 
         $post = $post->postReports()->create($attributes);
 
-        return $post;
+        if (!$post) {
+            return false;
+        }
+
+        return true;
     }
 }
