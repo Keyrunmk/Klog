@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Exceptions\ForbiddenException;
+use App\Exceptions\WebException;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RoleMiddleware
+class VerifiedUserMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,12 +16,11 @@ class RoleMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, string $role)
+    public function handle(Request $request, Closure $next, string $status)
     {
-        if (! Auth::guard("api")->user()->hasRole($role)) {
-            throw new ForbiddenException("Unauthorized", 403);
+        if (Auth::guard("api")->user()->status !== $status) {
+            throw new WebException("Please verify your acoount", 401);
         }
-
         return $next($request);
     }
 }

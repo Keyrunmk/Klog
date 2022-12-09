@@ -41,6 +41,7 @@ class AdminService
     {
         $attributes = $this->validateRegister->run($request);
 
+        DB::beginTransaction();
         try {
             foreach ($this->roleService->roles as $role) {
                 if ($role->slug === "page-manager") {
@@ -55,19 +56,16 @@ class AdminService
                 }
             }
 
-            DB::beginTransaction();
-
             $admin = $this->adminRepository->create($attributes);
             $this->roleModel->permissions()->saveMany($this->permissionModels);
             $admin->roles()->save($this->roleModel);
-
-
-            DB::commit();
         } catch (Exception $e) {
-                //implemnt db::intransaction() using macros
-                DB::rollBack();
+            //implemnt db::intransaction() using macros
+            DB::rollBack();
             return $e;
         }
+
+        DB::commit();
 
         return $admin;
     }

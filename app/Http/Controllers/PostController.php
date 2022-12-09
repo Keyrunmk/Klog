@@ -21,10 +21,10 @@ class PostController extends BaseController
         $this->postService = $postService;
     }
 
-    public function index(): ResourceCollection|JsonResponse
+    public function index(int $user_id): ResourceCollection|JsonResponse
     {
         try {
-            $posts = $this->postService->index();
+            $posts = $this->postService->index($user_id);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
@@ -48,10 +48,10 @@ class PostController extends BaseController
         return new PostResource($post);
     }
 
-    public function update(Post $post, Request $request): JsonResource|JsonResponse
+    public function update(int $post_id, Request $request): JsonResource|JsonResponse
     {
         try {
-            $post = $this->postService->update($post, $request);
+            $post = $this->postService->update($post_id, $request);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
@@ -59,14 +59,14 @@ class PostController extends BaseController
         return new PostResource($post);
     }
 
-    public function destroy(Post $post): JsonResource|JsonResponse
+    public function destroy(int $post_id): JsonResource|JsonResponse
     {
         try {
-            $post = $this->postRepository->deletePost($post->id);
+            $this->postService->delete($post_id);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
-        return new PostResource($post);
+        return $this->successResponse("Post deleted successfully");
     }
 }

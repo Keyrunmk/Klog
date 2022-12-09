@@ -20,7 +20,7 @@ class CommentService
 
     public function create(Post $post, Request $request): Comment
     {
-        $attributes = $this->commentValidation->run($request);
+        $attributes = $this->commentValidation->validate($request);
 
         try {
             $post->comments()->create([

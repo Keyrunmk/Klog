@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Contracts\TagContract;
-use App\Exceptions\WebException;
 use App\Models\Post;
 use App\Repositories\TagRepository;
 use Exception;

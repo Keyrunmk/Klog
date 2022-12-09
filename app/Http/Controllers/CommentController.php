@@ -20,7 +20,7 @@ class CommentController extends BaseController
     public function store(Post $post, Request $request): JsonResponse
     {
         try {
-            $comments = $this->commentService->create($post, $request);
+            $this->commentService->create($post, $request);
         } catch (Exception $e) {
             return $this->errorResponse($e->getCode(), $e->getMessage());
         }

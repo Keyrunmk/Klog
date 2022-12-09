@@ -30,7 +30,7 @@ class UserLogin
         try {
             $token = Auth::login($event->user);
         } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
+            throw $e;
         }
 
         return new UserResource($event->user, $token);

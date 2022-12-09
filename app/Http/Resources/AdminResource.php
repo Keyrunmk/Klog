@@ -3,9 +3,8 @@
 namespace App\Http\Resources;
 
 use App\Models\Admin;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminResource extends JsonResource
+class AdminResource extends BaseResource
 {
     public Admin $admin;
 
@@ -25,7 +24,7 @@ class AdminResource extends JsonResource
         return [
             "status" => "success",
             "id" => $this->admin->id,
-            "name" => $this->admin->first_name . $this->admin->last_name,
+            "name" => $this->admin->first_name . " " . $this->admin->last_name,
         ];
     }
 }

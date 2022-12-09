@@ -3,9 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Post;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class PostResource extends JsonResource
+class PostResource extends BaseResource
 {
     protected Post $post;
 
@@ -23,6 +21,7 @@ class PostResource extends JsonResource
     public function toArray($request)
     {
         return [
+            "status" => "success",
             "id" => $this->post->id,
             "title" => $this->post->title,
             "body" => $this->post->body,

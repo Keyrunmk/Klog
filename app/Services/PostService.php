@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\PostContract;
+use App\Exceptions\ForbiddenException;
 use App\facades\UserLocation;
 use App\Models\Location;
 use App\Models\Post;
@@ -26,21 +27,23 @@ class PostService
         $this->postValidation = $postValidation;
     }
 
-    public function index(): Collection
+    public function index(int $user_id): Collection
     {
         try {
-            $posts = Cache::rememberForever("posts", function () {
-                return $this->postRepository->findBy(["id" => auth()->user()->id]);
-            });
-            return $posts;
+            // $posts = Cache::remember("posts", 1, function () use ($user_id) {
+            //     return $this->postRepository->findBy(["user_id" => $user_id]);
+            // });
+            return $posts = $this->postRepository->findBy(["user_id" => $user_id]);
         } catch (Exception $e) {
             throw $e;
         }
+
+        return $posts;
     }
 
     public function store(Request $request): Post
     {
-        $attributes = $this->postValidation->run($request);
+        $attributes = $this->postValidation->validate($request);
         try {
             $location = UserLocation::getCountryName() ?? "world";
             $location_id = Location::where("country_name", $location)->value("id") ?? 1;
@@ -51,20 +54,18 @@ class PostService
             ]);
 
             if (($attributes["image"]) ?? false) {
-                $imagePath = request("image")->store("uploads", "public");
-                $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-                $image->save();
+                $imagePath = $this->getImagePath();
             }
 
             $post = $this->postRepository->create($attributes);
 
             if ($imagePath ?? false) {
-                $post->image()->create(["path" => $imagePath]);
+                $this->postRepository->saveImage($post, $imagePath);
             }
 
-            $post->location()->create(["country_name" => $location]);
+            $this->postRepository->savePostLocation($post, $location);
 
-            Cache::forget("posts");
+            // Cache::forget("posts");
         } catch (Exception $e) {
             throw $e;
         }
@@ -72,34 +73,55 @@ class PostService
         return $post;
     }
 
-    public function update(Post $post, Request $request): Post
+    public function update(int $post_id, Request $request): Post
     {
-        $attributes = $this->postValidation->run($request);
+        $attributes = $this->postValidation->validate($request);
 
         try {
-            $this->postRepository->update($attributes, $post->id);
-            $post = $this->postRepository->find($post->id);
+            $this->postRepository->update($attributes, $post_id);
+            $post = $this->postRepository->find($post_id);
             $post = $this->updateImage($post);
-            Cache::forget("posts");
+            // Cache::forget("posts");
         } catch (Exception $e) {
             throw $e;
         }
 
         return $post;
+    }
+
+    public function delete(int $post_id)
+    {
+        try {
+            $post = $this->postRepository->find($post_id);
+            if (auth()->user()->cannot("update", $post)) {
+                throw new ForbiddenException("Your are not authorized");
+            }
+
+            return $this->postRepository->delete($post_id);
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
     public function updateImage(Post $post): Post
     {
         try {
-            $imagePath = request("image")->store("uploads", "public");
-            $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
-            $image->save();
-            $post->image()->update(["path" => $imagePath]);
-            Cache::forget("posts");
+            $imagePath = $this->getImagePath();
+            $this->postRepository->updateImage($post, $imagePath);
+            // Cache::forget("posts");
         } catch (Exception $e) {
             throw $e;
         }
 
         return $post;
+    }
+
+    public function getImagePath(): string
+    {
+        $imagePath = request("image")->store("uploads", "public");
+        $image = Image::make(public_path("storage/$imagePath"))->fit(2000, 2000);
+        $image->save();
+
+        return $imagePath;
     }
 }
