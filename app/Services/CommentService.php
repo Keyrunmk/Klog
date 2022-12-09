@@ -18,9 +18,9 @@ class CommentService
         $this->commentValidation = $commentValidation;
     }
 
-    public function __invoke(Post $post, Request $request): Comment
+    public function create(Post $post, Request $request): Comment
     {
-        $attributes = $this->commentValidation->run($request);
+        $attributes = $this->commentValidation->validate($request);
 
         try {
             $post->comments()->create([

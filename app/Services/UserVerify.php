@@ -3,30 +3,33 @@
 namespace App\Services;
 
 use App\Enum\UserStatusEnum;
+use App\Exceptions\WebException;
+use App\Models\User;
 use App\Models\UserVerification;
 use Illuminate\Http\Request;
 
 class UserVerify
 {
-    public function __invoke(Request $request): string
+    public function verify(Request $request, User $user): string
     {
         $request = $request->validate([
-            "token" => ["required","string"],
+            "token" => ["required", "string"],
         ]);
 
-        $verifyUser = UserVerification::where("token", $request["token"])->first();
-        $message = "Sorry, your email cannot be verified.";
+        $verifyUser = UserVerification::where("token", $request["token"])->where("user_id", $user->id)->first();
 
-        if ($verifyUser) {
-            $user = $verifyUser->user;
-            $message = "Your email is already verified.";
+        if (!$verifyUser) {
+            throw new WebException("Invalid token", 500);
+        }
 
-            if (!$user->email_verified_at) {
-                $user->email_verified_at = now();
-                $user->status = UserStatusEnum::Active;
-                $user->save();
-                $message = "Your email is now verified.";
-            }
+        $user = $verifyUser->user;
+        $message = "Your email is already verified.";
+
+        if (!$user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->status = UserStatusEnum::Active;
+            $user->save();
+            $message = "Your email is now verified.";
         }
 
         return $message;

@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('profile_user_pivot');
+        Schema::dropIfExists('profile_user');
     }
 };

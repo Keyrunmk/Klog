@@ -3,11 +3,9 @@
 namespace App\Repositories;
 
 use App\Contracts\BaseContract;
-use App\Exceptions\WebException;
+use Error;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Database\QueryException;
 
 class BaseRepository implements BaseContract
 {
@@ -22,7 +20,7 @@ class BaseRepository implements BaseContract
     {
         try {
             return $this->model->create($attributes);
-        } catch (QueryException $e) {
+        } catch (Exception $e) {
             throw $e;
         }
     }
@@ -31,7 +29,7 @@ class BaseRepository implements BaseContract
     {
         try {
             return $this->model->find($id)->update($attributes);
-        } catch (Exception $e) {
+        } catch (Exception|Error $e) {
             throw $e;
         }
     }

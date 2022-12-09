@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RoleMiddleware
+class AdminRoleMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,10 +18,10 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, string $role)
     {
-        if (! Auth::guard("api")->user()->hasRole($role)) {
-            throw new ForbiddenException("Unauthorized", 403);
+        if (Auth::guard("admin-api")->user()->hasRole($role) || Auth::guard("admin-api")->user()->role->slug === "owner") {
+            return $next($request);
         }
 
-        return $next($request);
+        throw new ForbiddenException("Unauthorized", 403);
     }
 }

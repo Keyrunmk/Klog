@@ -50,7 +50,7 @@ Extras
 -> laravel octane --todo
 -> macros --todo
 -> enum
--> switch to uuid
+-> switch to uuid --todo
 
 ADMIN
 -> Admin login

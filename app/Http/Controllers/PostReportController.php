@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\WebException;
 use App\Models\Post;
 use App\Services\PostReportService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class PostReportController extends Controller
+class PostReportController extends BaseController
 {
     protected PostReportService $postReportService;
 
@@ -18,23 +17,15 @@ class PostReportController extends Controller
         $this->postReportService = $postReportService;
     }
 
-    public function __invoke(Post $post, Request $request): JsonResponse
+    public function report(Post $post, Request $request): JsonResponse
     {
         try {
-            $post = $this->postReportService->create($post, $request);
+            $this->postReportService->create($post, $request);
+            return $this->successResponse("Report submitted successfully");
         } catch (Exception $e) {
-            throw new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getCode(), $e->getMessage());
         }
 
-        if ($post) {
-            return response()->json([
-                "status" => "Reported successfully",
-                "post" => $post->title,
-            ]);
-        }
-
-        return response()->json([
-            "status" => "Post report failed",
-        ]);
+        return $this->errorResponse("Failed to submit report");
     }
 }
