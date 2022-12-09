@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Traits\HasRolesAndPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,7 +21,8 @@ class Admin extends Authenticatable implements JWTSubject
         "last_name",
         "username",
         "email",
-        "password"
+        "role_id",
+        "password",
     ];
 
     /**
@@ -52,8 +53,8 @@ class Admin extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function roles(): BelongsToMany
+    public function role(): BelongsTo
     {
-        return $this->belongsToMany(Role::class, "admins_roles");
+        return $this->belongsTo(Role::class);
     }
 }

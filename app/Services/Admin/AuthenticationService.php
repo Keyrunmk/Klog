@@ -3,13 +3,13 @@
 namespace App\Services\Admin;
 
 use App\Contracts\AdminContract;
-use App\Http\Resources\BaseResource;
+use App\Exceptions\ForbiddenException;
+use App\Models\Role;
 use App\Repositories\AdminRepository;
 use App\Validations\AdminLogin;
 use App\Validations\AdminRegister;
-use Illuminate\Http\JsonResponse;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
@@ -27,24 +27,36 @@ class AuthenticationService
         $this->validateLogin = $validateLogin;
     }
 
-    public function register(Request $request): mixed
+    public function register(Request $request): array
     {
-        $attributes = $this->validateRegister->run($request);
+        if (auth()->guard("admin-api")->user()->cannot("create", Admin::class)) {
+            throw new ForbiddenException("Only owners can create admins");
+        }
+
+        $attributes = $this->validateRegister->validate($request);
         $attributes["password"] = Hash::make($attributes["password"]);
 
         try {
+            $role = Role::where("slug", "admin")->first();
+            $attributes = array_merge($attributes, [
+                "role_id" => $role->id,
+            ]);
+
             $admin = $this->adminRepository->create($attributes);
             $token = Auth::guard("admin-api")->login($admin);
         } catch (JWTException $e) {
             throw $e;
         }
 
-        return $token;
+        return [
+            "admin" => $admin,
+            "token" => $token,
+        ];
     }
 
     public function login(Request $request): string
     {
-        $attributes = $this->validateLogin->run($request);
+        $attributes = $this->validateLogin->validate($request);
         try {
             $token = Auth::guard("admin-api")->attempt($attributes);
         } catch (JWTException $e) {
@@ -59,6 +71,19 @@ class AuthenticationService
         try {
             Auth::guard("admin-api")->logout();
         } catch (JWTException $e) {
+            throw $e;
+        }
+    }
+
+    public function delete(int $admin_id): void
+    {
+        if (auth()->guard("admin-api")->user()->cannot("create", Admin::class)) {
+            throw new ForbiddenException("Only owners can remove admins");
+        }
+
+        try {
+            $this->adminRepository->delete($admin_id);
+        } catch (Exception $e) {
             throw $e;
         }
     }

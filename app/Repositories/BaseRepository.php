@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\BaseContract;
+use Error;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +29,7 @@ class BaseRepository implements BaseContract
     {
         try {
             return $this->model->find($id)->update($attributes);
-        } catch (Exception $e) {
+        } catch (Exception|Error $e) {
             throw $e;
         }
     }

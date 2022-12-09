@@ -13,21 +13,20 @@ trait HasRolesAndPermissions
         return $this->belongsTo(Role::class);
     }
 
-    public function hasRole($role): bool
+    public function hasRole(string $role): bool
     {
-        if ($this->role) {
-            return $this->role->slug === $role;
-        }
-        return false;
+        return $this->role->slug === $role;
     }
 
-    public function hasPermissionThroughRole($permission): bool
+    public function hasPermissionThroughRole(string $permissionSlug): bool
     {
-        foreach ($permission->roles as $role) {
-            if ($this->roles->contains($role)) {
+        $permissions = $this->role->permissions;
+        foreach ($permissions as $permission) {
+            if ($permission->slug === $permissionSlug) {
                 return true;
             }
         }
+
         return false;
     }
 }
