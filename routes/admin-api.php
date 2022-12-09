@@ -30,7 +30,7 @@ Route::post("login", [LoginController::class, "login"]);
 Route::post("logout", [LoginController::class, "logout"])->middleware("auth:admin-api");
 
 Route::middleware("auth:admin-api")->group(function () {
-    Route::post("register", RegisterController::class);
+    Route::post("register", [RegisterController::class, "register"]);
     // Manager
     Route::prefix("manager")->group(function () {
         Route::post("", [ManagerController::class, "store"]);

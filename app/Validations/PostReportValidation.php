@@ -10,8 +10,6 @@ class PostReportValidation extends Validation
     {
         return [
             "case" => ["required", "string", "max:500"],
-            "post_id" => ["required", Rule::exists("posts", "id")],
-            "user_id" => ["required", Rule::exists("users", "id")],
         ];
     }
 }

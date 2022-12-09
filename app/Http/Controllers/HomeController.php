@@ -5,44 +5,38 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PostsCollection;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use App\Repositories\PostRepository;
+use App\Services\HomeService;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class HomeController extends Controller
 {
-    public function index()
+    public HomeService $homeService;
+
+    public function __construct(HomeService $homeService)
     {
-        if (auth()->user ?? false) {
-            $location = auth()->user()->location->first();
-            $authPosts = $location->posts()->get();
-
-            $userTags = auth()->user()->tags()->get();
-
-            foreach ($userTags as $tag) {
-                $authPosts->add($tag->posts);
-            }
-        }
-
-        $posts = Post::latest()->filter(request(["search"]))->get();
-
-        if ($authPosts ?? false) {
-            $posts->add($authPosts);
-        }
-
-        return response()->json($posts);
+        $this->homeService = $homeService;
     }
 
-    public function store(User $user)
+    public function index(): JsonResource
     {
-        $attributes = request()->validate([
-            "name" => ["required", "string"],
-        ]);
+        $posts = $this->homeService->getPosts();
 
-        $tag = $user->tags()->create($attributes);
-
-        return response()->json([
-            "status" => "success",
-            "tag_id" => $tag->id,
-            "tag" => $tag->name,
-        ]);
+        return new PostsCollection($posts);
     }
+
+    // public function store(User $user)
+    // {
+    //     $attributes = request()->validate([
+    //         "name" => ["required", "string"],
+    //     ]);
+
+    //     $tag = $user->tags()->create($attributes);
+
+    //     return response()->json([
+    //         "status" => "success",
+    //         "tag_id" => $tag->id,
+    //         "tag" => $tag->name,
+    //     ]);
+    // }
 }

@@ -2,10 +2,16 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class PostResource extends JsonResource
+use App\Models\Post;
+class PostResource extends BaseResource
 {
+    protected Post $post;
+
+    public function __construct(Post $post)
+    {
+        $this->post = $post;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -14,6 +20,11 @@ class PostResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            "status" => "success",
+            "id" => $this->post->id,
+            "title" => $this->post->title,
+            "body" => $this->post->body,
+        ];
     }
 }

@@ -5,7 +5,15 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enum\UserStatusEnum;
+use App\Traits\HasRolesAndPermissions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -13,7 +21,7 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRolesAndPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -25,8 +33,8 @@ class User extends Authenticatable implements JWTSubject
         "last_name",
         "username",
         "email",
+        "role_id",
         "password",
-        "status",
     ];
 
     /**
@@ -46,7 +54,6 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         "email_verified_at" => "datetime",
-        "status" => UserStatusEnum::class,
     ];
 
     /**
@@ -67,7 +74,7 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public static function boot()
+    public static function boot(): void
     {
         parent::boot();
 
@@ -78,32 +85,32 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
-    public function profile()
+    public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
     }
 
-    public function posts()
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class)->orderBy("created_at", "DESC");
     }
 
-    public function image()
+    public function image(): MorphOne
     {
         return $this->morphOne(Image::class, "imageable");
     }
 
-    public function tags()
+    public function tags(): MorphToMany
     {
         return $this->morphToMany(Tag::class, "taggable");
     }
 
-    public function location()
+    public function location(): MorphMany
     {
         return $this->morphMany(Location::class, "locationable");
     }
 
-    public function following()
+    public function following(): BelongsToMany
     {
         return $this->belongsToMany(Profile::class);
     }

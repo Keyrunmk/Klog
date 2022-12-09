@@ -27,13 +27,13 @@ class AdminsTableSeeder extends Seeder
         $admin->save();
 
         $permission = new Permission();
-        $permission->name = "Page Admin";
-        $permission->slug = "page-admin";
+        $permission->name = "Page Owner";
+        $permission->slug = "page-owner";
         $permission->save();
 
         $role = new Role();
-        $role->name = "Page Admin";
-        $role->slug = "page-admin";
+        $role->name = "Owner";
+        $role->slug = "owner";
         $role->save();
 
         $role->permissions()->save($permission);

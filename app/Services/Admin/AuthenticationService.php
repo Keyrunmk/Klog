@@ -7,6 +7,7 @@ use App\Http\Resources\BaseResource;
 use App\Repositories\AdminRepository;
 use App\Validations\AdminLogin;
 use App\Validations\AdminRegister;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -31,47 +32,34 @@ class AuthenticationService
         $attributes = $this->validateRegister->run($request);
         $attributes["password"] = Hash::make($attributes["password"]);
 
-        $admin = $this->adminRepository->create($attributes);
         try {
+            $admin = $this->adminRepository->create($attributes);
             $token = Auth::guard("admin-api")->login($admin);
         } catch (JWTException $e) {
-            return response()->json(["message" => $e->getMessage()]);
+            throw $e;
         }
 
-        return [
-            "admin" => $admin,
-            "token" => $token,
-        ];
+        return $token;
     }
 
-    public function login(Request $request): JsonResource|array
+    public function login(Request $request): string
     {
         $attributes = $this->validateLogin->run($request);
         try {
             $token = Auth::guard("admin-api")->attempt($attributes);
         } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
+            throw $e;
         }
 
-        if (!$token) {
-            return new BaseResource([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        };
-
-        return [
-            "admin" => Auth::guard("admin-api")->user(),
-            "token" => $token,
-        ];
+        return $token;
     }
 
-    public function logout()
+    public function logout(): void
     {
         try {
             Auth::guard("admin-api")->logout();
         } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
+            throw $e;
         }
     }
 }

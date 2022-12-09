@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\WebException;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
 use App\Services\ProfileService;
 use Exception;
 use Illuminate\Http\Request;
 
-class ProfileController extends Controller
+class ProfileController extends BaseController
 {
     protected $profileRepository;
     protected ProfileService $profileService;
@@ -19,17 +18,24 @@ class ProfileController extends Controller
         $this->profileService = $profileService;
     }
 
-    public function show(Profile $profile): ProfileResource
+    public function show(int $profile_id): ProfileResource
     {
+        try {
+            $profile = $this->profileService->find($profile_id);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), (int)$e->getCode());
+        }
         return new ProfileResource($profile);
     }
 
-    public function update(Profile $profile, Request $request): mixed
+    public function update(int $profile_id, Request $request): mixed
     {
         try {
-            $profile = $this->profileService->__invoke($profile, $request);
+            $profile = $this->profileService->find($profile_id);
+            $this->authorize("update", $profile);
+            $profile = $this->profileService->update($profile, $request);
         } catch (Exception $e) {
-            throw new WebException($e->getCode() ,$e->getMessage());
+            return $this->errorResponse($e->getMessage(), (int)$e->getCode());
         }
 
         return new ProfileResource($profile);

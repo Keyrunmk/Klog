@@ -34,10 +34,7 @@ class BasePolicy
      */
     public function viewAny(User $user, Model $model)
     {
-        if (auth()->user()->id === $user->id) {
-            return true;
-        }
-        return false;
+        return $user->id === $model->user->id;
     }
 
     /**
@@ -73,7 +70,7 @@ class BasePolicy
      */
     public function update(User $user, Model $model)
     {
-        return $user->id === $model->user_id ? Response::allow() : Response::deny("No !");
+        return $user->id == $model->user_id;
     }
 
     /**
@@ -82,30 +79,8 @@ class BasePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, $post)
+    public function delete(User $user, Model $model)
     {
-        return $user->id === $post->user_id;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, $post)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, $post)
-    {
-        //
+        return $user->id === $model->user_id;
     }
 }

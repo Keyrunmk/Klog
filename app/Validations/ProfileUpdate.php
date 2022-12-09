@@ -10,7 +10,6 @@ class ProfileUpdate extends Validation
             "title" => ["nullable", "string", "max:255"],
             "description" => ["nullable", "string", "max:500"],
             "url" => ["nullable", "url", "max:255"],
-            "image" => ["nullable", "image"],
         ];
     }
 }

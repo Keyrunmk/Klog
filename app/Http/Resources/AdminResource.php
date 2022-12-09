@@ -3,17 +3,14 @@
 namespace App\Http\Resources;
 
 use App\Models\Admin;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class AdminResource extends JsonResource
+class AdminResource extends BaseResource
 {
     public Admin $admin;
-    public string $token;
 
-    public function __construct(Admin $admin, string $token)
+    public function __construct(Admin $admin)
     {
         $this->admin = $admin;
-        $this->token = $token;
     }
 
     /**
@@ -26,12 +23,8 @@ class AdminResource extends JsonResource
     {
         return [
             "status" => "success",
-            "message" => "Admin created successfully",
-            "admin" => $this->admin,
-            "authorization" => [
-                "token" => $this->token,
-                "type" => "bearer"
-            ],
+            "id" => $this->admin->id,
+            "name" => $this->admin->first_name . " " . $this->admin->last_name,
         ];
     }
 }
