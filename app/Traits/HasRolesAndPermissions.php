@@ -2,25 +2,31 @@
 
 namespace App\Traits;
 
+use App\Models\Role;
+
 trait HasRolesAndPermissions
 {
-    public function hasRole(...$roles): bool
+    public Role $roles;
+
+    public function role()
     {
-        foreach ($roles as $role) {
-            if ($this->roles->contains("slug", $role)) {
-                return true;
-            }
-        }
-        return false;
+        return $this->belongsTo(Role::class);
     }
 
-    public function hasPermissionThroughRole($permission): bool
+    public function hasRole(string $role): bool
     {
-        foreach ($permission->roles as $role) {
-            if ($this->roles->contains($role)) {
+        return $this->role->slug === $role;
+    }
+
+    public function hasPermissionThroughRole(string $permissionSlug): bool
+    {
+        $permissions = $this->role->permissions;
+        foreach ($permissions as $permission) {
+            if ($permission->slug === $permissionSlug) {
                 return true;
             }
         }
+
         return false;
     }
 }

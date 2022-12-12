@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Post;
 use App\Validations\PostReportValidation;
+use Exception;
 use Illuminate\Http\Request;
 
 class PostReportService
@@ -15,16 +16,14 @@ class PostReportService
         $this->postReportValidation = $postReportValidation;
     }
 
-    public function create(Post $post, Request $request)
+    public function create(Post $post, Request $request): void
     {
-        $attributes = $this->postReportValidation->run($request);
-        $attributes = array_merge($request->validated(), [
+        $attributes = $this->postReportValidation->validate($request);
+        $attributes = array_merge($attributes, [
             "post_id" => $post->id,
             "user_id" => auth()->user()->id,
         ]);
 
-        $post = $post->postReports()->create($attributes);
-
-        return $post;
+        $post->postReports()->create($attributes);
     }
 }

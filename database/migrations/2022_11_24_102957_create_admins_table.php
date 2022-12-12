@@ -13,13 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create("admins", function (Blueprint $table) {
             $table->id();
-            $table->string('first_name')->max(255);
-            $table->string('last_name')->max(255);
-            $table->string('username')->max(255)->unique();
-            $table->string('email')->max(255)->unique();
-            $table->string('password')->min(8)->max(255);
+            $table->string("first_name")->max(255);
+            $table->string("last_name")->max(255);
+            $table->string("username")->max(255)->unique();
+            $table->string("email")->max(255)->unique();
+            $table->integer("role_id");
+            $table->string("password")->min(8)->max(255);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists("admins");
     }
 };

@@ -3,13 +3,15 @@
 namespace App\Services\Admin;
 
 use App\Contracts\AdminContract;
-use App\Http\Resources\BaseResource;
+use App\Models\Role;
 use App\Repositories\AdminRepository;
 use App\Validations\AdminLogin;
 use App\Validations\AdminRegister;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
@@ -26,16 +28,24 @@ class AuthenticationService
         $this->validateLogin = $validateLogin;
     }
 
-    public function register(Request $request): mixed
+    public function register(Request $request): array
     {
-        $attributes = $this->validateRegister->run($request);
+        $attributes = $this->validateRegister->validate($request);
         $attributes["password"] = Hash::make($attributes["password"]);
 
-        $admin = $this->adminRepository->create($attributes);
         try {
+            $role = Cache::remember("role-admin", 86400, function () {
+                return Role::where("slug", "admin")->first();
+            });
+
+            $attributes = array_merge($attributes, [
+                "role_id" => $role->id,
+            ]);
+
+            $admin = $this->adminRepository->create($attributes);
             $token = Auth::guard("admin-api")->login($admin);
-        } catch (JWTException $e) {
-            return response()->json(["message" => $e->getMessage()]);
+        } catch (Exception $e) {
+            throw $e;
         }
 
         return [
@@ -44,34 +54,20 @@ class AuthenticationService
         ];
     }
 
-    public function login(Request $request): JsonResource|array
+    public function login(Request $request): string
     {
-        $attributes = $this->validateLogin->run($request);
-        try {
-            $token = Auth::guard("admin-api")->attempt($attributes);
-        } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
-        }
+        $attributes = $this->validateLogin->validate($request);
 
-        if (!$token) {
-            return new BaseResource([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        };
-
-        return [
-            "admin" => Auth::guard("admin-api")->user(),
-            "token" => $token,
-        ];
+        return Auth::guard("admin-api")->attempt($attributes);
     }
 
-    public function logout()
+    public function logout(): void
     {
-        try {
-            Auth::guard("admin-api")->logout();
-        } catch (JWTException $e) {
-            return new BaseResource(["message" => $e->getMessage()]);
-        }
+        Auth::guard("admin-api")->logout();
+    }
+
+    public function delete(int $admin_id): void
+    {
+        $this->adminRepository->delete($admin_id);
     }
 }

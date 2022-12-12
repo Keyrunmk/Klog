@@ -3,9 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\User;
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class LoginResource extends JsonResource
+class LoginResource extends BaseResource
 {
     public User $model;
     public string $token;

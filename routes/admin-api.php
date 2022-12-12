@@ -1,10 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\EditorController;
-use App\Http\Controllers\Admin\LoginController;
-use App\Http\Controllers\Admin\ManagerController;
-use App\Http\Controllers\Admin\ModeratorController;
-use App\Http\Controllers\Admin\RegisterController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,36 +22,18 @@ Route::get("/custom", function () {
 })->name("login");
 
 //login and registration
-Route::post("login", [LoginController::class, "login"]);
-Route::post("logout", [LoginController::class, "logout"])->middleware("auth:admin-api");
+Route::post("login", [AdminController::class, "login"]);
+Route::post("logout", [AdminController::class, "logout"])->middleware("auth:admin-api");
 
-Route::middleware("auth:admin-api")->group(function () {
-    Route::post("register", RegisterController::class);
-    // Manager
-    Route::prefix("manager")->group(function () {
-        Route::post("", [ManagerController::class, "store"]);
-        Route::get("{admin}", [ManagerController::class, "show"]);
-    });
-
-    // Editor
-    Route::prefix("editor")->group(function () {
-        Route::post("", [EditorController::class, "store"]);
-        Route::get("reports", [EditorController::class, "show"]);
-        // show user some message using listener when their post is deleted
-        Route::delete("post/{post}", [EditorController::class, "delete"]);
-        Route::post("user/{user}", [EditorController::class, "warn"]);
-    });
-
-    // Moderator
-    Route::prefix("moderator")->group(function () {
-        Route::post("", [ModeratorController::class, "store"]);
-    });
+Route::middleware("auth:admin-api", "adminRoute:admin")->group(function () {
+    Route::post("register", [AdminController::class, "register"]);
+    Route::delete("{admin_id}", [AdminController::class, "destroy"]);
 
     //categories
     Route::prefix("category")->group(function () {
         Route::post("", [CategoryController::class, "store"]);
-        Route::patch("{category}", [CategoryController::class, "update"]);
-        Route::get("{category:slug}", [CategoryController::class, "show"]);
-        Route::delete("{category:slug}", [CategoryController::class, "destroy"]);
+        Route::patch("{category_id}", [CategoryController::class, "update"]);
+        Route::get("{category_id}", [CategoryController::class, "show"]);
+        Route::delete("{category_id}", [CategoryController::class, "destroy"]);
     });
 });

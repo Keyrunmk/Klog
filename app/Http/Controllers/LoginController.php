@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\BaseResource;
-use App\Http\Resources\LoginResource;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\WebException;
 use App\Services\UserService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
-class LoginController extends Controller
+class LoginController extends BaseController
 {
     protected UserService $userService;
 
@@ -19,31 +21,37 @@ class LoginController extends Controller
         $this->middleware("guest:api")->only("login");
     }
 
-    public function login(Request $request): JsonResource
+    public function login(Request $request): JsonResponse
     {
-        $data = $this->userService->login($request);
-
-        if ($data instanceof JsonResource) {
-            return $data;
+        try {
+            $token = $this->userService->login($request);
+        } catch (NotFoundException $e) {
+            return $this->errorResponse("Please register first", (int) $e->getCode());
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
-        return new LoginResource($data["user"], $data["token"]);
+        Cache::flush();
+        return $this->successResponse($token);
     }
 
-    public function logout(): JsonResource
+    public function logout(): JsonResponse
     {
-        $this->userService->logout();
+        try {
+            $this->userService->logout();
+        } catch (JWTException $e) {
+            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        }
 
-        return new BaseResource([
-            'status' => 'success',
-            'message' => 'Logged out successfully',
-        ]);
+        return $this->successResponse("Logged out successfully");
     }
 
-    public function refreshToken(): JsonResource
+    public function refreshToken(): JsonResponse
     {
-        $newToken = $this->userService->refreshToken();
-
-        return new LoginResource(Auth::user(), $newToken);
+        try {
+            return $this->successResponse($this->userService->refreshToken());
+        } catch (JWTException $e) {
+            return $this->errorResponse("Please, login first", 403);
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\UserRegisteredEvent;
+use App\Events\VerifyUserEvent;
 use App\Listeners\ChooseNewUserTags;
 use App\Listeners\EmailVerification;
 use App\Listeners\SendBlogAgreement;
@@ -27,9 +28,11 @@ class EventServiceProvider extends ServiceProvider
         UserRegisteredEvent::class => [
             // SendBlogAgreement::class,
             EmailVerification::class,
-            UserLogin::class,
+        ],
+        VerifyUserEvent::class => [
+            // UserLogin::class,
             SendWelcomeEmail::class,
-            ChooseNewUserTags::class,
+            // ChooseNewUserTags::class,
         ],
     ];
 

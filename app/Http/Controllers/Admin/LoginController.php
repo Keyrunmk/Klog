@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 use App\Http\Resources\BaseResource;
-use App\Http\Resources\LoginResource;
 use App\Services\Admin\AuthenticationService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LoginController extends Controller
+class LoginController extends BaseController
 {
     protected AuthenticationService $authenticationService;
 
@@ -19,19 +20,20 @@ class LoginController extends Controller
         // $this->middleware("guest:admin-api");
     }
 
-    public function login(Request $request): JsonResource
+    public function login(Request $request): JsonResponse
     {
-        $data = $this->authenticationService->login($request);
+        $token = $this->authenticationService->login($request);
 
-        return new LoginResource($data["admin"], $data["token"]);
+        return $this->successResponse($token);
     }
 
-    public function logout(): JsonResource
+    public function logout(): JsonResponse
     {
-        $this->authenticationService->logout();
-
-        return new BaseResource([
-            "status" => "Logged out successfully",
-        ]);
+        try {
+            $this->authenticationService->logout();
+            return $this->successResponse("Logged out successfully");
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), $e->getCode());
+        }
     }
 }

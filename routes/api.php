@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\HomeController;
@@ -44,10 +43,10 @@ Route::get("/redirect", function (Request $request) {
         "response_type" => "code",
         "scope" => "",
         "state" => "",
-        "prompt" => "login", // "none", "consent", or "login"
+        "prompt" => "consent", // "none", "consent", or "login"
     ]);
 
-    return redirect("http://localhost:3001/oauth/authorize?".$query);
+    return redirect("http://localhost:3001/oauth/authorize?" . $query);
 });
 
 Route::get("callback", CallbackController::class);
@@ -57,37 +56,44 @@ Route::get("/", [HomeController::class, "index"]);
 
 //login and registration
 Route::post("login", [LoginController::class, "login"]);
-Route::post("register", RegisterController::class);
-Route::post("verify-email", AuthController::class)->middleware("auth:api");
+Route::post("register", [RegisterController::class, "register"]);
+Route::post("verify-email/{user}", [RegisterController::class, "verify"]);
 Route::post("logout", [LoginController::class, "logout"])->middleware("auth:api");
 Route::post("refresh", [LoginController::class, "refreshToken"])->middleware("auth:api");
 
-Route::middleware("auth:api")->group(function () {
+Route::middleware("auth:api", "role:user", "verify:active")->group(function () {
     //profile
     Route::prefix("profile")->group(function () {
-        Route::get("{profile}", [ProfileController::class, "show"])->middleware("can:view,profile");
-        Route::patch("{profile}", [ProfileController::class, "update"])->middleware("can:update,profile");
-        Route::post("{user}", FollowController::class);
+        Route::get("{profile_id}", [ProfileController::class, "show"]);
+        Route::patch("{profile_id}", [ProfileController::class, "update"]);
+        Route::post("{profile_id}/follow", [FollowController::class, "follow"]);
     });
 
     //posts
-    Route::prefix("post")->middleware("auth:api")->controller(PostController::class)->group(function () {
-        Route::get("", "index");
+    Route::prefix("post")->controller(PostController::class)->group(function () {
+        Route::get("user/{user_id}", "index");
         Route::post("", "store");
-        Route::patch("{post}", "update")->middleware("can:update,post");
-        Route::get("{post:slug}", "show")->middleware("can:view,post");
-        Route::delete("{post:slug}", "destroy");
+        Route::patch("{post_id}", "update")->middleware("can:update,post");
+        Route::get("show/{post}", "show");
+        Route::delete("{post_id}", "destroy");
 
         // Report Post
-        Route::post("{post:slug}/report", PostReportController::class);
+        Route::post("{post:slug}/report", [PostReportController::class, "report"]);
 
         //comments
-        Route::post("{post:slug}/comment", [CommentController::class, "store"]);
+        Route::post("{post}/comment", [CommentController::class, "store"]);
+        Route::delete("{post}/comment/{comment}", [CommentController::class, "store"]);
     });
 
     //tags
     Route::prefix("tag")->group(function () {
         Route::post("post/{post}", [TagController::class, "store"]);
-        Route::post("user/{user}", [HomeController::class, "store"]);
+        // Route::post("user/{user}", [HomeController::class, "store"]);
     });
+});
+
+Route::fallback(function () {
+    return response()->json([
+        'message' => 'Page Not Found. If error persists, contact info@klog.com'
+    ], 404);
 });

@@ -10,13 +10,9 @@ interface BaseContract
 
     public function all($columns = array("*"), string $orderBy = "id", string $sortBy = "asc"): mixed;
 
-    public function find(int $id): mixed;
-
     public function findOneOrFail(int $id): mixed;
 
     public function findBy(array $data): mixed;
-
-    public function findOneBy(array $data): mixed;
 
     public function findOneByOrFail(array $data): mixed;
 

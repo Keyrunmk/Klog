@@ -3,16 +3,17 @@
 namespace App\Services;
 
 use App\Contracts\UserContract;
-use App\facades\UserLocation;
-use App\Http\Resources\BaseResource;
+use App\Enum\UserStatusEnum;
+use App\Exceptions\NotFoundException;
+use App\Exceptions\WebException;
+use App\Models\Role;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Validations\UserLogin;
 use App\Validations\UserRegister;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
@@ -30,14 +31,18 @@ class UserService
         $this->validateLogin = $validateLogin;
     }
 
-    public function register(Request $request): User|Exception
+    public function register(Request $request): User
     {
-        $attributes = $this->validateRegister->run($request);
+        $attributes = $this->validateRegister->validate($request);
         $attributes["password"] = Hash::make($attributes["password"]);
 
         try {
+            $role = Role::where("slug", "user")->first();
+            $attributes = array_merge($attributes, [
+                "role_id" => $role->id,
+            ]);
             $user = $this->userRepository->create($attributes);
-            $this->setLocation($user);
+            $this->userRepository->setLocation($user);
         } catch (Exception $e) {
             throw $e;
         }
@@ -45,56 +50,34 @@ class UserService
         return $user;
     }
 
-    public function login(Request $request): JsonResource|array
+    public function login(Request $request): string
     {
-        $attributes = $this->validateLogin->run($request);
+        $attributes = $this->validateLogin->validate($request);
 
         try {
+            $user = $this->userRepository->findWhere($attributes["email"], UserStatusEnum::Active);
+            if (!$user) {
+                throw new WebException("Please, verify your email", 403);
+            }
             $token = Auth::attempt($attributes);
-        } catch (JWTException $e) {
-            return new BaseResource(['message' => $e->getMessage()]);
+        } catch (ModelNotFoundException $e) {
+            throw new NotFoundException();
         }
 
         if (!$token) {
-            return new BaseResource([
-                'status' => 'error',
-                'message' => 'Something went wrong',
-            ]);
+            throw new Exception("Failed to authenticate", 500);
         };
 
-        return [
-            "user" => Auth::user(),
-            "token" => $token,
-        ];
+        return $token;
     }
 
-    public function logout()
+    public function logout(): void
     {
-        try {
-            Auth::logout();
-        } catch (JWTException $e) {
-            return new BaseResource(['message' => $e->getMessage()]);
-        }
+        Auth::guard("api")->logout();
     }
 
-    public function refreshToken(): string|HttpResponse
+    public function refreshToken(): string
     {
-        try {
-            $newToken = Auth::refresh();
-        } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()]);
-        }
-
-        return $newToken;
-    }
-
-    public function setLocation(User $user): JsonResource
-    {
-        $userLocation = UserLocation::getCountryName();
-        $user->location()->create(["country_name" => $userLocation]);
-
-        return new BaseResource([
-            "location" => "User location set successfully",
-        ]);
+        return Auth::refresh();
     }
 }
