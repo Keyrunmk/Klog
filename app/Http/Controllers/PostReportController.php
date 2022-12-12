@@ -22,8 +22,8 @@ class PostReportController extends BaseController
         try {
             $this->postReportService->create($post, $request);
             return $this->successResponse("Report submitted successfully");
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getCode(), $e->getMessage());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getCode(), $exception->getMessage());
         }
 
         return $this->errorResponse("Failed to submit report");

@@ -5,11 +5,13 @@ namespace App\Providers;
 use App\Contracts\AdminContract;
 use App\Contracts\CategoryContract;
 use App\Contracts\PostContract;
+use App\Contracts\ProfileContract;
 use App\Contracts\TagContract;
 use App\Contracts\UserContract;
 use App\Repositories\AdminRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PostRepository;
+use App\Repositories\ProfileRepository;
 use App\Repositories\TagRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
@@ -43,7 +45,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public function boot()
     {
         foreach ($this->repositories as $interface => $repository) {
-            $this->app->bind($interface, $repository);
+            $this->app->singleton($interface, $repository);
         }
     }
 }

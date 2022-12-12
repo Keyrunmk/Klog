@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\CategoryContract;
-use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use App\Validations\CategoryValidation;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class CategoryService
 {

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exceptions\ForbiddenException;
 use App\Http\Controllers\BaseController;
 use App\Http\Resources\AdminResource;
 use App\Services\Admin\AuthenticationService;
@@ -10,7 +9,6 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
 class AdminController extends BaseController
@@ -20,28 +18,26 @@ class AdminController extends BaseController
     public function __construct(AuthenticationService $authenticationService)
     {
         $this->authenticationService = $authenticationService;
-        $this->middleware("adminRole:create")->only(["register","destroy"]);
+        $this->middleware("adminRole:create")->only(["register", "destroy"]);
     }
 
-    public function register(Request $request): JsonResponse|JsonResource
+    public function register(Request $request): JsonResponse
     {
         try {
             $data = $this->authenticationService->register($request);
-        } catch (JWTException $e) {
-            return $this->errorResponse("Failed to get token for admin id: ". $data["admin"]->id, (int) $e->getCode());
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
-        return new AdminResource($data["admin"], $data["token"]);
+        return $this->successResponse(message: "Admin created", data: new AdminResource($data["admin"], $data["token"]));
     }
 
     public function login(Request $request): JsonResponse
     {
         try {
             $token = $this->authenticationService->login($request);
-        } catch (JWTException $e) {
-            return $this->errorResponse("Invalid Credentials", (int) $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         return $this->successResponse($token);
@@ -51,8 +47,8 @@ class AdminController extends BaseController
     {
         try {
             $this->authenticationService->logout();
-        } catch (JWTException $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
         return $this->successResponse("Logged out successfully");
@@ -62,10 +58,10 @@ class AdminController extends BaseController
     {
         try {
             $this->authenticationService->delete($admin_id);
-        } catch (ModelNotFoundException $e) {
-            return $this->errorResponse("Failed to find the admin with id: $admin_id", (int) $e->getCode());
-        } catch (Exception $e) {
-            return $this->errorResponse("Failed to delete admin id: $admin_id", (int) $e->getCode());
+        } catch (ModelNotFoundException $exception) {
+            return $this->errorResponse("Failed to find the admin with id: $admin_id", (int) $exception->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         return $this->successResponse("Admin id: $admin_id deleted successfully");

@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Contracts\AdminContract;
+use App\Exceptions\WebException;
 use App\Models\Role;
 use App\Repositories\AdminRepository;
 use App\Validations\AdminLogin;
@@ -10,6 +11,7 @@ use App\Validations\AdminRegister;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -44,8 +46,11 @@ class AuthenticationService
 
             $admin = $this->adminRepository->create($attributes);
             $token = Auth::guard("admin-api")->login($admin);
-        } catch (Exception $e) {
-            throw $e;
+            if (empty($token)) {
+                throw new WebException("Failed to login", Response::HTTP_UNAUTHORIZED);
+            }
+        } catch (Exception $exception) {
+            throw $exception;
         }
 
         return [
@@ -58,7 +63,13 @@ class AuthenticationService
     {
         $attributes = $this->validateLogin->validate($request);
 
-        return Auth::guard("admin-api")->attempt($attributes);
+        $token =  Auth::guard("admin-api")->attempt($attributes);
+
+        if (empty($token)) {
+            throw new WebException("Invalid Credentials", Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $token;
     }
 
     public function logout(): void

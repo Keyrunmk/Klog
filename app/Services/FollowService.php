@@ -26,8 +26,8 @@ class FollowService
             $response = auth()->user()->following()->toggle($user);
         } catch (ModelNotFoundException $e) {
             throw new NotFoundException();
-        }catch (Exception $e) {
-            throw $e;
+        }catch (Exception $exception) {
+            throw $exception;
         }
 
         if (!empty($response["attached"])) {

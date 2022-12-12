@@ -26,8 +26,8 @@ class RegisterController extends BaseController
     {
         try {
             $user = $this->userService->register($request);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         return UserRegisteredEvent::dispatch($user);
@@ -37,8 +37,8 @@ class RegisterController extends BaseController
     {
         try {
             $message = $this->userVerify->verify($request, $user);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         VerifyUserEvent::dispatch($user);

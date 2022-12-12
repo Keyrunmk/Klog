@@ -19,10 +19,10 @@ class FollowController extends BaseController
     {
         try {
             $response = $this->followService->followProfile($profile_id);
-        } catch(NotFoundException $e) {
-            return $this->errorResponse("Couldn't find the profile to follow", (int) $e->getCode());
-        }catch (Exception $e) {
-            return $this->errorResponse("Something went wrong", (int)$e->getCode());
+        } catch(NotFoundException $exception) {
+            return $this->errorResponse("Couldn't find the profile to follow", (int) $exception->getCode());
+        }catch (Exception $exception) {
+            return $this->errorResponse("Something went wrong", (int)$exception->getCode());
         }
 
         return $this->successResponse($response);

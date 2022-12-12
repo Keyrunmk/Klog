@@ -58,8 +58,8 @@ class PostService
             $this->postRepository->savePostLocation($post, $location);
 
             // Cache::forget("posts");
-        } catch (Exception $e) {
-            throw $e;
+        } catch (Exception $exception) {
+            throw $exception;
         }
 
         return $post;
@@ -75,7 +75,7 @@ class PostService
             $this->postRepository->update($attributes, $post_id);
             $post = $this->updateImage($post);
             // Cache::forget("posts");
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $exception) {
             throw new NotFoundException();
         }
 

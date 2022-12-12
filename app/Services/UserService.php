@@ -43,8 +43,8 @@ class UserService
             ]);
             $user = $this->userRepository->create($attributes);
             $this->userRepository->setLocation($user);
-        } catch (Exception $e) {
-            throw $e;
+        } catch (Exception $exception) {
+            throw $exception;
         }
 
         return $user;
@@ -60,7 +60,7 @@ class UserService
                 throw new WebException("Please, verify your email", 403);
             }
             $token = Auth::attempt($attributes);
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $exception) {
             throw new NotFoundException();
         }
 

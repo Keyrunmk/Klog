@@ -26,8 +26,8 @@ class TagController extends BaseController
 
         try {
             $post->tags()->create($attributes);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
         return $this->successResponse("Tag created successfully");

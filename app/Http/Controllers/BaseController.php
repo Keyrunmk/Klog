@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Responses\CustomResponse;
+use App\Traits\CustomResponse;
 
 class BaseController extends Controller
 {

@@ -45,8 +45,8 @@ class ProfileService
                     $user->image()->create(["path" => $imagePath]);
                 }
             }
-        } catch (Exception $e) {
-            throw $e;
+        } catch (Exception $exception) {
+            throw $exception;
         }
 
         return $profile;

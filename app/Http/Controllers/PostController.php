@@ -10,8 +10,6 @@ use App\Services\PostService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class PostController extends BaseController
 {
@@ -20,60 +18,61 @@ class PostController extends BaseController
     public function __construct(PostService $postService)
     {
         $this->postService = $postService;
+        $this->middleware("can:update,post")->only("update");
     }
 
-    public function index(int $user_id): ResourceCollection|JsonResponse
+    public function index(int $user_id): JsonResponse
     {
         try {
             $posts = $this->postService->index($user_id);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
-        return new PostsCollection($posts);
+        return $this->successResponse(message: "Posts if user id: $user_id", data: new PostsCollection($posts));
     }
 
-    public function show(Post $post): JsonResource|JsonResponse
+    public function show(Post $post): JsonResponse
     {
         try {
-            return new PostResource($post);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+            return $this->successResponse(message: "Post fetched", data: new PostResource($post));
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
     }
 
-    public function store(Request $request): JsonResource|JsonResponse
+    public function store(Request $request): JsonResponse
     {
         try {
             $post = $this->postService->store($request);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
-        return new PostResource($post);
+        return $this->successResponse(message: "Post stored", data: new PostResource($post));
     }
 
-    public function update(int $post_id, Request $request): JsonResource|JsonResponse
+    public function update(int $post_id, Request $request): JsonResponse
     {
         try {
             $post = $this->postService->update($post_id, $request);
-        } catch(NotFoundException $e) {
-            return $this->errorResponse("No post with post id: $post_id", (int) $e->getCode());
-        }catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (NotFoundException $exception) {
+            return $this->errorResponse("No post with post id: $post_id", (int) $exception->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
-        return new PostResource($post);
+        return $this->successResponse(message: "post id: $post_id updated", data: new PostResource($post));
     }
 
-    public function destroy(int $post_id): JsonResource|JsonResponse
+    public function destroy(int $post_id): JsonResponse
     {
         try {
             $this->postService->delete($post_id);
-        } catch (NotFoundException $e) {
-            return $this->errorResponse("No post with id: $post_id", (int) $e->getCode());
-        }catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (NotFoundException $exception) {
+            return $this->errorResponse("No post with id: $post_id", (int) $exception->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
         return $this->successResponse("Post deleted successfully");

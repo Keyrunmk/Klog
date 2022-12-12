@@ -70,12 +70,15 @@ Route::middleware("auth:api", "role:user", "verify:active")->group(function () {
     });
 
     //posts
-    Route::prefix("post")->controller(PostController::class)->group(function () {
-        Route::get("user/{user_id}", "index");
-        Route::post("", "store");
-        Route::patch("{post_id}", "update")->middleware("can:update,post");
-        Route::get("show/{post}", "show");
-        Route::delete("{post_id}", "destroy");
+    // Route::resource("post", PostController::class);
+    Route::prefix("post")->group(function () {
+        Route::controller(PostController::class)->group(function () {
+            Route::get("user/{user_id}", "index");
+            Route::post("", "store");
+            Route::patch("{post_id}", "update");
+            Route::get("show/{post}", "show");
+            Route::delete("{post_id}", "destroy");
+        });
 
         // Report Post
         Route::post("{post:slug}/report", [PostReportController::class, "report"]);

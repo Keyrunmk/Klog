@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\NotFoundException;
-use App\Exceptions\WebException;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -25,10 +24,10 @@ class LoginController extends BaseController
     {
         try {
             $token = $this->userService->login($request);
-        } catch (NotFoundException $e) {
-            return $this->errorResponse("Please register first", (int) $e->getCode());
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (NotFoundException $exception) {
+            return $this->errorResponse("Please register first", (int) $exception->getCode());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), $exception->getCode());
         }
 
         Cache::flush();
@@ -39,8 +38,8 @@ class LoginController extends BaseController
     {
         try {
             $this->userService->logout();
-        } catch (JWTException $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        } catch (JWTException $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         return $this->successResponse("Logged out successfully");
@@ -50,8 +49,8 @@ class LoginController extends BaseController
     {
         try {
             return $this->successResponse($this->userService->refreshToken());
-        } catch (JWTException $e) {
-            return $this->errorResponse("Please, login first", 403);
+        } catch (JWTException $exception) {
+            return $this->errorResponse("Please, login first", (int) $exception->getCode());
         }
     }
 }

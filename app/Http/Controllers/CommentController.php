@@ -23,8 +23,8 @@ class CommentController extends BaseController
     {
         try {
             $this->commentService->create($post, $request);
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getCode(), $e->getMessage());
+        } catch (Exception $exception) {
+            return $this->errorResponse($exception->getCode(), $exception->getMessage());
         }
 
         return $this->successResponse("Commented successfully");
@@ -34,10 +34,10 @@ class CommentController extends BaseController
     {
         try {
             $this->commentService->destroy($post, $comment);
-        } catch(ForbiddenException $e) {
-            return $this->errorResponse("You cannot delete this comment", (int) $e->getCode());
-        }catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        } catch(ForbiddenException $exception) {
+            return $this->errorResponse("You cannot delete this comment", (int) $exception->getCode());
+        }catch (Exception $exception) {
+            return $this->errorResponse($exception->getMessage(), (int) $exception->getCode());
         }
 
         return $this->successResponse("Comment id: $comment->id deleted.");
