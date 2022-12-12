@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 
 class ForbiddenException extends BaseException
 {
-    public function __construct(string $message, int $code=Response::HTTP_FORBIDDEN)
+    public function __construct(string $message = "This page is forbidden", int $code = Response::HTTP_FORBIDDEN)
     {
         $this->message = $message;
         $this->code = $code;

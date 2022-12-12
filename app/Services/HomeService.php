@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Contracts\PostContract;
-use App\Models\Post;
 use App\Repositories\PostRepository;
 use Illuminate\Database\Eloquent\Collection;
 

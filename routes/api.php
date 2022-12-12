@@ -66,7 +66,7 @@ Route::middleware("auth:api", "role:user", "verify:active")->group(function () {
     Route::prefix("profile")->group(function () {
         Route::get("{profile_id}", [ProfileController::class, "show"]);
         Route::patch("{profile_id}", [ProfileController::class, "update"]);
-        Route::post("{user}", [FollowController::class, "follow"]);
+        Route::post("{profile_id}/follow", [FollowController::class, "follow"]);
     });
 
     //posts
@@ -81,7 +81,8 @@ Route::middleware("auth:api", "role:user", "verify:active")->group(function () {
         Route::post("{post:slug}/report", [PostReportController::class, "report"]);
 
         //comments
-        Route::post("{post:slug}/comment", [CommentController::class, "store"]);
+        Route::post("{post}/comment", [CommentController::class, "store"]);
+        Route::delete("{post}/comment/{comment}", [CommentController::class, "store"]);
     });
 
     //tags

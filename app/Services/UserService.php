@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\UserContract;
 use App\Enum\UserStatusEnum;
+use App\Exceptions\NotFoundException;
 use App\Exceptions\WebException;
 use App\Models\Role;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Repositories\UserRepository;
 use App\Validations\UserLogin;
 use App\Validations\UserRegister;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -58,8 +60,8 @@ class UserService
                 throw new WebException("Please, verify your email", 403);
             }
             $token = Auth::attempt($attributes);
-        } catch (JWTException $e) {
-            throw $e;
+        } catch (ModelNotFoundException $e) {
+            throw new NotFoundException();
         }
 
         if (!$token) {
@@ -71,21 +73,11 @@ class UserService
 
     public function logout(): void
     {
-        try {
-            Auth::guard("api")->logout();
-        } catch (JWTException $e) {
-            throw $e;
-        }
+        Auth::guard("api")->logout();
     }
 
     public function refreshToken(): string
     {
-        try {
-            $newToken = Auth::refresh();
-        } catch (JWTException $e) {
-            throw $e;
-        }
-
-        return $newToken;
+        return Auth::refresh();
     }
 }

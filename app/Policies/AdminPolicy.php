@@ -32,7 +32,7 @@ class AdminPolicy
         return auth()->guard("admin-api")->user()->role->slug === "owner";
     }
 
-    public function createCategory(Admin $admin): Response|bool
+    public function createCategory(Admin $admin): bool
     {
         return auth()->guard("admin-api")->user()->hasPermissionThroughRole("create-category");
     }

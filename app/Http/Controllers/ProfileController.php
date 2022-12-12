@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
 use App\Services\ProfileService;
@@ -34,6 +35,8 @@ class ProfileController extends BaseController
             $profile = $this->profileService->find($profile_id);
             $this->authorize("update", $profile);
             $profile = $this->profileService->update($profile, $request);
+        } catch (NotFoundException $e) {
+            return $this->errorResponse("No profile with given id", (int) $e->getCode());
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), (int)$e->getCode());
         }

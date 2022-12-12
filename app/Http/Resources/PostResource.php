@@ -5,13 +5,6 @@ namespace App\Http\Resources;
 use App\Models\Post;
 class PostResource extends BaseResource
 {
-    protected Post $post;
-
-    public function __construct(Post $post)
-    {
-        $this->post = $post;
-    }
-
     /**
      * Transform the resource into an array.
      *
@@ -21,10 +14,9 @@ class PostResource extends BaseResource
     public function toArray($request)
     {
         return [
-            "status" => "success",
-            "id" => $this->post->id,
-            "title" => $this->post->title,
-            "body" => $this->post->body,
+            "id" => $this->id,
+            "title" => $this->title,
+            "body" => $this->body,
         ];
     }
 }

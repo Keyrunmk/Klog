@@ -2,50 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\CategoryContract;
-use App\Exceptions\ForbiddenException;
+use App\Exceptions\NotFoundException;
 use App\Http\Resources\CategoryResource;
-use App\Models\Category;
-use App\Repositories\CategoryRepository;
-use Error;
+use App\Services\CategoryService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Validation\Rule;
 
 class CategoryController extends BaseController
 {
-    protected CategoryRepository $categoryRepository;
+    protected CategoryService $categoryService;
 
-    public function __construct(CategoryContract $categoryRepository)
+    public function __construct(CategoryService $categoryService)
     {
-        $this->categoryRepository = $categoryRepository;
-        if (auth()->guard("admin-api")->user()->cannot("createCategory", Admin::class)) {
-            throw new ForbiddenException("Only admins can crud on category");
-        }
+        $this->categoryService = $categoryService;
+
+        $this->middleware("adminRole:createCategory")->except("show");
     }
 
     public function show(int $category_id): JsonResponse|JsonResource
     {
         try {
-            $category = $this->categoryRepository->find($category_id);
+            $category = $this->categoryService->show($category_id);
         } catch (Exception $e) {
-            return $this->errorResponse("Failed to find category", (int) $e->getCode());
+            return $this->errorResponse("Category not found", (int) $e->getCode());
         }
 
         return new CategoryResource($category);
     }
 
-    public function store(): JsonResponse|JsonResource
+    public function store(Request $request): JsonResponse|JsonResource
     {
-        $attributes = request()->validate([
-            "name" => ["string", "required", Rule::unique("categories", "name")],
-            "slug" => ["string", "required", Rule::unique("categories", "slug")],
-        ]);
-
         try {
-            $category = $this->categoryRepository->create($attributes);
+            $category = $this->categoryService->create($request);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), (int) $e->getCode());
         }
@@ -53,18 +43,13 @@ class CategoryController extends BaseController
         return new CategoryResource($category);
     }
 
-    public function update(int $category_id): JsonResponse|JsonResource
+    public function update(int $category_id, Request $request): JsonResponse|JsonResource
     {
-        $attributes = request()->validate([
-            "name" => ["required", "string", Rule::unique("categories", "name")],
-            "slug" => ["required", "string", Rule::unique("categories", "slug")],
-        ]);
-
         try {
-            $this->categoryRepository->update($attributes, $category_id);
-
-        $category = $this->categoryRepository->find($category_id);
-        } catch (Exception|Error $e) {
+            $category = $this->categoryService->update($category_id, $request);
+        } catch (NotFoundException $e) {
+            return $this->errorResponse($e->getMessage(), $e->getCode());
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), (int) $e->getCode());
         }
 
@@ -74,7 +59,7 @@ class CategoryController extends BaseController
     public function destroy(int $category_id): JsonResponse|JsonResource
     {
         try {
-            $this->categoryRepository->delete($category_id);
+            $this->categoryService->delete($category_id);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), (int) $e->getCode());
         }

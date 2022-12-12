@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Exceptions\NotFoundException;
 use App\Services\FollowService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-
 class FollowController extends BaseController
 {
     public FollowService $followService;
@@ -18,11 +15,13 @@ class FollowController extends BaseController
         $this->followService = $followService;
     }
 
-    public function follow(User $user): JsonResponse
+    public function follow(int $profile_id): JsonResponse
     {
         try {
-            $response = $this->followService->followProfile($user);
-        } catch (Exception $e) {
+            $response = $this->followService->followProfile($profile_id);
+        } catch(NotFoundException $e) {
+            return $this->errorResponse("Couldn't find the profile to follow", (int) $e->getCode());
+        }catch (Exception $e) {
             return $this->errorResponse("Something went wrong", (int)$e->getCode());
         }
 

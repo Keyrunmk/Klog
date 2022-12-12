@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\NotFoundException;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\PostsCollection;
 use App\Models\Post;
@@ -32,9 +33,13 @@ class PostController extends BaseController
         return new PostsCollection($posts);
     }
 
-    public function show(Post $post): JsonResource
+    public function show(Post $post): JsonResource|JsonResponse
     {
-        return new PostResource($post);
+        try {
+            return new PostResource($post);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        }
     }
 
     public function store(Request $request): JsonResource|JsonResponse
@@ -52,7 +57,9 @@ class PostController extends BaseController
     {
         try {
             $post = $this->postService->update($post_id, $request);
-        } catch (Exception $e) {
+        } catch(NotFoundException $e) {
+            return $this->errorResponse("No post with post id: $post_id", (int) $e->getCode());
+        }catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 
@@ -63,7 +70,9 @@ class PostController extends BaseController
     {
         try {
             $this->postService->delete($post_id);
-        } catch (Exception $e) {
+        } catch (NotFoundException $e) {
+            return $this->errorResponse("No post with id: $post_id", (int) $e->getCode());
+        }catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), $e->getCode());
         }
 

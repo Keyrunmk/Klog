@@ -3,11 +3,11 @@
 namespace App\Http\Middleware;
 
 use App\Exceptions\ForbiddenException;
-use App\Models\Admin;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class AdminRoleMiddleware
+class AdminRouteMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,12 +16,12 @@ class AdminRoleMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, string $policyName)
+    public function handle(Request $request, Closure $next, string $role)
     {
-        if (auth()->guard("admin-api")->user() && auth()->guard("admin-api")->user()->cannot($policyName, Admin::class)) {
-            throw new ForbiddenException();
+        if (Auth::guard("admin-api")->user()->hasRole($role) || Auth::guard("admin-api")->user()->role->slug === "owner") {
+            return $next($request);
         }
 
-        return $next($request);
+        throw new ForbiddenException();
     }
 }

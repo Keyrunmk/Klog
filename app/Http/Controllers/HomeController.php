@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PostsCollection;
-use App\Models\Post;
-use App\Models\User;
-use App\Repositories\PostRepository;
 use App\Services\HomeService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class HomeController extends Controller
+class HomeController extends BaseController
 {
     public HomeService $homeService;
 
@@ -18,9 +17,13 @@ class HomeController extends Controller
         $this->homeService = $homeService;
     }
 
-    public function index(): JsonResource
+    public function index(): JsonResponse|JsonResource
     {
-        $posts = $this->homeService->getPosts();
+        try {
+            $posts = $this->homeService->getPosts();
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        }
 
         return new PostsCollection($posts);
     }

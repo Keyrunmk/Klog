@@ -24,10 +24,6 @@ class PostReportService
             "user_id" => auth()->user()->id,
         ]);
 
-        try {
-            $post->postReports()->create($attributes);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $post->postReports()->create($attributes);
     }
 }

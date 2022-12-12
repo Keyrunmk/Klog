@@ -9,10 +9,10 @@ abstract class Validation
 {
     abstract public function rules(): array;
 
-    public function validate(Request $input): array
+    public function validate(Request $request): array
     {
-        $input =  $input->all();
+        $request =  $request->all();
 
-        return Validator::make($input, $this->rules())->validate();
+        return Validator::make($request, $this->rules())->validate();
     }
 }

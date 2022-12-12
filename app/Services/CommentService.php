@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\ForbiddenException;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Validations\CommentValidation;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,15 +22,20 @@ class CommentService
     {
         $attributes = $this->commentValidation->validate($request);
 
-        try {
-            $post->comments()->create([
-                "user_id" => Auth::user()->id,
-                "body" => $attributes["body"],
-            ]);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $post->comments()->create([
+            "user_id" => Auth::user()->id,
+            "body" => $attributes["body"],
+        ]);
 
         return $post->comments;
+    }
+
+    public function destroy(Post $post, Comment $comment): void
+    {
+        if (auth()->user()->can("delete", $post) || auth()->user()->can("delete", $comment)) {
+            $comment->delete();
+        }
+
+        throw new ForbiddenException();
     }
 }

@@ -3,9 +3,10 @@
 namespace App\Repositories;
 
 use App\Contracts\BaseContract;
-use Error;
+use App\Exceptions\NotFoundException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BaseRepository implements BaseContract
 {
@@ -18,82 +19,36 @@ class BaseRepository implements BaseContract
 
     public function create(array $attributes): mixed
     {
-        try {
-            return $this->model->create($attributes);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->create($attributes);
     }
 
     public function update(array $attributes, int $id): mixed
     {
-        try {
-            return $this->model->find($id)->update($attributes);
-        } catch (Exception|Error $e) {
-            throw $e;
-        }
+        return $this->model->findOrFail($id)->update($attributes);
     }
 
     public function all($columns = array("*"), string $orderBy = "id", string $sortBy = "asc"): mixed
     {
-        try {
-            return $this->model->orderBy($orderBy, $sortBy)->get($columns);
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function find(int $id): mixed
-    {
-        try {
-            return $this->model->find($id);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->orderBy($orderBy, $sortBy)->get($columns);
     }
 
     public function findOneOrFail(int $id): mixed
     {
-        try {
-            return $this->model->findOrFail($id);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->findOrFail($id);
     }
 
     public function findBy(array $data): mixed
     {
-        try {
-            return $this->model->where($data)->get();
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function findOneBy(array $data): mixed
-    {
-        try {
-            return $this->model->where($data)->first();
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->where($data)->get();
     }
 
     public function findOneByOrFail(array $data): mixed
     {
-        try {
-            return $this->model->where($data)->firstOrFail();
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->where($data)->firstOrFail();
     }
 
     public function delete(int $id): mixed
     {
-        try {
-            return $this->model->find($id)->delete();
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->model->findOrFail($id)->delete();
     }
 }

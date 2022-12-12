@@ -23,11 +23,7 @@ class ProfileService
 
     public function find(int $profile_id): Profile
     {
-        try {
-            return $this->profileRepository->find($profile_id);
-        } catch (Exception $e) {
-            throw $e;
-        }
+        return $this->profileRepository->findOneOrFail($profile_id);
     }
 
     public function update(Profile $profile, Request $request): Profile
