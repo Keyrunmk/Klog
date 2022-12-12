@@ -3,15 +3,16 @@
 namespace App\Http\Resources;
 
 use App\Models\User;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class UserResource extends BaseResource
 {
-    public $user;
-    public $token;
+    protected User $user;
+    protected string $token;
+    protected string $message;
 
-    public function __construct(User $user, $token)
+    public function __construct(string $message = "", User $user, string $token = "")
     {
+        $this->message = $message;
         $this->user = $user;
         $this->token = $token;
     }
@@ -24,14 +25,25 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            "status" => "success",
-            "message" => "User created successfully",
-            "user" => $this->user,
-            "authorization" => [
-                "token" => $this->token,
-                "type" => "bearer"
-            ],
+        $response = [
+            "status" => $this->user->status,
+            "id" => $this->user->id,
+            "name" => $this->user->first_name . " " . $this->user->last_name,
+            "username" => $this->user->username,
         ];
+
+        if (!empty($this->message)) {
+            $response = array_merge($response, [
+                "message" => $this->message,
+            ]);
+        }
+
+        if (!empty($this->token)) {
+            $response = array_merge($response, [
+                "token" => $this->token,
+            ]);
+        }
+
+        return $response;
     }
 }

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer("locationable_id");
             $table->string("locationable_type");
             $table->timestamps();
+
+            $table->index(["country_name", "locationable_id", "locationable_type"]);
         });
     }
 

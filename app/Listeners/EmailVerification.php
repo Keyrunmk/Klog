@@ -2,11 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Http\Resources\BaseResource;
+use App\Http\Resources\UserResource;
 use App\Mail\VerifyEmail;
 use App\Models\UserVerification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -39,6 +37,6 @@ class EmailVerification
 
         Mail::to($event->user->email)->send(new VerifyEmail($token));
 
-        return new BaseResource(["status" => "Check your mail for verification."]);
+        return new UserResource("Check your mail to verify account", $event->user);
     }
 }

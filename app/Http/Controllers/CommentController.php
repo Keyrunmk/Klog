@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\WebException;
-use App\Http\Resources\CommentResource;
+use App\Exceptions\ForbiddenException;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Services\CommentService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
-class CommentController extends Controller
+class CommentController extends BaseController
 {
     protected CommentService $commentService;
 
@@ -19,14 +19,27 @@ class CommentController extends Controller
         $this->commentService = $commentService;
     }
 
-    public function store(Post $post, Request $request): JsonResource
+    public function store(Post $post, Request $request): JsonResponse
     {
         try {
-            $comments = $this->commentService->__invoke($post, $request);
+            $this->commentService->create($post, $request);
         } catch (Exception $e) {
-            throw new WebException($e->getCode(), $e->getMessage());
+            return $this->errorResponse($e->getCode(), $e->getMessage());
         }
 
-        return new CommentResource($comments);
+        return $this->successResponse("Commented successfully");
+    }
+
+    public function delete(Post $post, Comment $comment): JsonResponse
+    {
+        try {
+            $this->commentService->destroy($post, $comment);
+        } catch(ForbiddenException $e) {
+            return $this->errorResponse("You cannot delete this comment", (int) $e->getCode());
+        }catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), (int) $e->getCode());
+        }
+
+        return $this->successResponse("Comment id: $comment->id deleted.");
     }
 }

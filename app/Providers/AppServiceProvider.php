@@ -33,12 +33,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         BaseResource::withoutWrapping();
-        UserResource::withoutWrapping();
-        LoginResource::withoutWrapping();
-        ProfileResource::withoutWrapping();
-        PostResource::withoutWrapping();
-        CommentResource::withoutWrapping();
-        CategoryResource::withoutWrapping();
 
         DB::listen(function ($query) {
             File::append(
